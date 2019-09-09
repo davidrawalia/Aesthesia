@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+# VS settings
+.vs/
+
+# Logs and debug dbs
+*.log
+*.pdb
+*.tlog
+*.iobj
+*.ipdb
+*.ilk
+*.idb
