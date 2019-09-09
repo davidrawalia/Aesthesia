@@ -16,7 +16,7 @@ out vec4 color;
 
 void main()
 {
-	vec3 cubeColour = vec3(texture(textureMap, outTex));
+	vec3 cubeColour = vec3(outColor);
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 	vec3 specularColor = vec3(1.0f, 1.0f, 1.0f);
 	float specularStrength = 0.5;

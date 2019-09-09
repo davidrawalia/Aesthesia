@@ -5,5 +5,4 @@ public:
 
 private:
 	GLuint ProgramID;
-
 };

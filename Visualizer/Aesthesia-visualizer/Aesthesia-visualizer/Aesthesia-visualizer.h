@@ -1,10 +1,9 @@
 #pragma once
 
-#pragma once
-
 #include "Shader.h"
 #include "Camera.h"
 #include "Object.h"
+#include "Cube.h"
 
 bool debug = false;
 const GLuint WINDOW_WIDTH = 1000, WINDOW_HEIGHT = 1000;
@@ -36,19 +35,14 @@ bool mousePressed[3];
 int width = WINDOW_WIDTH;
 int height = WINDOW_HEIGHT;
 GLenum renderMode = GL_FILL;
-GLfloat textureBool = 1.0f;
+GLfloat textureBool = 1.0;
 
-
-
-
-void drawHorse();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void framebuffer_size_callback(GLFWwindow* window, int newwidth, int newheight);
 void doMovement();
-
 
 int init();
 int main();
