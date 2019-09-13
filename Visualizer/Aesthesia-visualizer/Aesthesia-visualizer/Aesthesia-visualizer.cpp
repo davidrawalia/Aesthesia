@@ -96,6 +96,20 @@ int main()
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
 
+		using namespace boost::interprocess;
+		try {
+			shared_memory_object shm(open_only, "shared_memory", read_only);
+			mapped_region region(shm, read_only);
+			char *mem = static_cast<char*>(region.get_address());
+			*bluebk = (int)*mem/100.0;
+			*redbk = (int)*mem / 100.0;
+			*greenbk = (int)*mem / 100.0;
+		}
+		catch (interprocess_exception e) {
+			std::cout << e.what() << '\n';
+		}
+
+
 		//	FPS counter
 		GLdouble currentTime = glfwGetTime();
 		deltaTime = currentTime - lastFrame;
@@ -235,7 +249,7 @@ int init() {
 	glfwWindowHint(GLFW_DEPTH_BITS, 32);
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Lab", nullptr, nullptr);
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Aesthesia", nullptr, nullptr);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
