@@ -37,6 +37,9 @@ int height = WINDOW_HEIGHT;
 GLenum renderMode = GL_FILL;
 GLfloat textureBool = 1.0;
 
+float inData = 0.1;
+float lastFrameData = 0.01;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
