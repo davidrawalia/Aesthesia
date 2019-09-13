@@ -18,6 +18,7 @@ int main()
 	struct sockaddr_in server, si_other;
 	int slen, recv_len;
 	char buf[BUFLEN];
+	std::string data;
 	WSADATA wsa;
 
 	slen = sizeof(si_other);
@@ -51,30 +52,51 @@ int main()
 	}
 	puts(" Bind done");
 
-	//keep listening for data
-	while (1)
-	{
+	//Create shared memory to route data to visualizer  
+	using namespace boost::interprocess;
+	try {
+		shared_memory_object::remove("shared_memory");
+		shared_memory_object shm_obj(create_only, "shared_memory", read_write);
+		shm_obj.truncate(10);
+		mapped_region region(shm_obj, read_write);
 
-		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN);
-
-		//try to receive some data, this is a blocking call
-		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) & si_other, & slen)) == SOCKET_ERROR)
+		//keep listening for data
+		while (1)
 		{
-			printf("recvfrom() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
+
+			//clear the buffer by filling null, it might have previously received data
+			memset(buf, '\0', BUFLEN);
+
+			//try to receive some data, this is a blocking call
+			if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) & si_other, &slen)) == SOCKET_ERROR)
+			{
+				printf("recvfrom() failed with error code : %d", WSAGetLastError());
+				exit(EXIT_FAILURE);
+			}
+
+			//print details of the client/peer and the data received
+			printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+			printf("Data: %s\n", buf);
+
+			//parse buffer data and write to shared memory
+			data = buf;
+			data = data.substr(5, 6);
+			std::memset(region.get_address(), std::stoi(data), 1);
+
+			//now reply the client with the same data
+			if (sendto(s, buf, recv_len, 0, (struct sockaddr*) & si_other, slen) == SOCKET_ERROR)
+			{
+				printf("sendto() failed with error code : %d", WSAGetLastError());
+				exit(EXIT_FAILURE);
+			}
 		}
 
-		//print details of the client/peer and the data received
-		printf("Received packet from %s:%d\n" , inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-		printf("Data: %s\n", buf);
-
-		//now reply the client with the same data
-		if (sendto(s, buf, recv_len, 0, (struct sockaddr*) & si_other, slen) == SOCKET_ERROR)
-		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
-		}
+		//Destroy shared memory  
+		using namespace boost::interprocess;
+		shared_memory_object::remove("shared_memory");
+	}
+	catch (interprocess_exception e) {
+		std::cout << e.what() << '\n';
 	}
 
 	closesocket(s);

@@ -10,6 +10,9 @@
 #include "/libs/glm/glm/gtx/rotate_vector.hpp"
 #include "/libs/glm/glm/gtx/normal.hpp"
 #include "/libs/soil2/src/SOIL2/SOIL2.h"
+#include <exception>
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 #include <iostream>
 #include <string>
 #include <fstream>
