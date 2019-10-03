@@ -37,7 +37,6 @@ int height = WINDOW_HEIGHT;
 GLenum renderMode = GL_FILL;
 GLfloat textureBool = 1.0;
 
-std::pair<float*, int> input;
 float inData = 0.1;
 float lastFrameData = 0.01;
 

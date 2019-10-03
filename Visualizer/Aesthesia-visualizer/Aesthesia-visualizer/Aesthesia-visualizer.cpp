@@ -102,8 +102,7 @@ int main()
 		using namespace boost::interprocess;
 		try {
 			managed_shared_memory segment(open_only, "shared_memory");
-			input = segment.find<float>("data");
-			inData = *input.first;
+			inData = *segment.find<float>("data").first;
 		}
 		catch (interprocess_exception e) {
 			std::cout << e.what() << '\n';
