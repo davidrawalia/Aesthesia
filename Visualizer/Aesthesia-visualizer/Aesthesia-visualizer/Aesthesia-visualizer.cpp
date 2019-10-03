@@ -101,19 +101,17 @@ int main()
 		// Read incoming data from shared memory
 		using namespace boost::interprocess;
 		try {
-			shared_memory_object shm(open_only, "shared_memory", read_only);
-			mapped_region region(shm, read_only);
-			char *mem = static_cast<char*>(region.get_address());
-			inData = (int)*mem / 100.0;
+			managed_shared_memory segment(open_only, "shared_memory");
+			inData = *segment.find<float>("data").first;
 		}
 		catch (interprocess_exception e) {
 			std::cout << e.what() << '\n';
 		}
-		
+
 		std::cout << lastFrameData << " last frame data\n";
 		std::cout << inData << " in data no smooth\n";
 		// Smooth incoming data
-		if (lastFrameData > inData && lastFrameData > 0.1) inData = lastFrameData - 0.025;
+		if (lastFrameData > inData && lastFrameData > 0.1) inData = lastFrameData - 50;
 		std::cout << inData << " in data smooth\n\n";
 
 
@@ -224,7 +222,7 @@ int main()
 			glPolygonMode(GL_FRONT_AND_BACK, renderMode);
 
 			glm::mat4 cubeTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-			cubeTransform = glm::scale(cubeTransform, glm::vec3(inData*50, 5.0f, 5.0f));
+			cubeTransform = glm::scale(cubeTransform, glm::vec3(inData*0.01, 5.0f, 5.0f));
 			cubeTransform = worldTransform * cubeTransform;
 
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(cubeTransform));

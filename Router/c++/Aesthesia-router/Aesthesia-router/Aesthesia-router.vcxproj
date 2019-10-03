@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Aesthesia_router.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
