@@ -9,6 +9,11 @@
 #include <exception>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <cstdlib>
+#include <cstddef>
+#include <cassert>
+#include <utility>
 #include <iostream>
 #include <string>
 
