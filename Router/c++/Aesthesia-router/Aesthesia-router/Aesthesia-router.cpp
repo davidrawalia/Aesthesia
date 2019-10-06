@@ -43,7 +43,7 @@ int main()
 		shared_memory_object::remove("shared_memory");
 		managed_shared_memory segment(create_only, "shared_memory", 65536);
 
-		float *shared_data = segment.construct<float>("data")(1);
+		float *shared_data = segment.construct<float>("data")[128](100.0);
 
 		//keep listening for data
 		while (1)
@@ -65,7 +65,12 @@ int main()
 			//parse buffer data and write to shared memory
 			data_string = buf;
 			data = std::stof(data_string.substr(5, 6));
-			*shared_data = data;
+			dataIndex = data_string[3]-48;
+			*(shared_data + dataIndex) = data;
+
+			std::cout << *(shared_data + dataIndex) << ": shared_data \n";
+			std::cout << dataIndex << ": dataIndex\n";
+
 
 			//now reply the client with the same data
 			if (sendto(s, buf, recv_len, 0, (struct sockaddr*) & si_other, slen) == SOCKET_ERROR)

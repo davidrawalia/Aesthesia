@@ -15,4 +15,5 @@ int slen, recv_len;
 char buf[BUFLEN];
 std::string data_string;
 float data;
+int dataIndex;
 WSADATA wsa;
