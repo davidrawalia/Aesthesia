@@ -96,24 +96,26 @@ int main()
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
 		
-		lastFrameData = inData;
+		for (int i = 0; i < 127; i++) {
+			lastFrameData[i] = inData[i];
+		}
 
 		// Read incoming data from shared memory
 		using namespace boost::interprocess;
 		try {
 			managed_shared_memory segment(open_only, "shared_memory");
-			inData = *segment.find<float>("data").first;
+			inDataLenght = segment.find<float>("data").second;
+			for (int i = 0; i < 127; i++) {
+				*(inData + i) = *(segment.find<float>("data").first + i);
+			}
 		}
 		catch (interprocess_exception e) {
 			std::cout << e.what() << '\n';
 		}
 
-		std::cout << lastFrameData << " last frame data\n";
-		std::cout << inData << " in data no smooth\n";
-		// Smooth incoming data
-		if (lastFrameData > inData && lastFrameData > 0.1) inData = lastFrameData - 50;
-		std::cout << inData << " in data smooth\n\n";
-
+		for (int i = 0; i < 127; i++) {
+			if (lastFrameData[i] > inData[i] && lastFrameData[i] > 50) inData[i] = lastFrameData [i] - 50;
+		}
 
 		//	FPS counter
 		GLdouble currentTime = glfwGetTime();
@@ -222,7 +224,7 @@ int main()
 			glPolygonMode(GL_FRONT_AND_BACK, renderMode);
 
 			glm::mat4 cubeTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-			cubeTransform = glm::scale(cubeTransform, glm::vec3(inData*0.01, 5.0f, 5.0f));
+			cubeTransform = glm::scale(cubeTransform, glm::vec3(inData[0]*0.01, inData[1] * 0.01, 5.0f));
 			cubeTransform = worldTransform * cubeTransform;
 
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(cubeTransform));
