@@ -13,6 +13,7 @@ SOCKET s;
 struct sockaddr_in server, si_other;
 int slen, recv_len;
 char buf[BUFLEN];
+rapidjson::Document d;
 std::string data_string;
 float data;
 int dataIndex;

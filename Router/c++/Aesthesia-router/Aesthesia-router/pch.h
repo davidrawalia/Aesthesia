@@ -10,6 +10,9 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 #include <cstdlib>
 #include <cstddef>
 #include <cassert>
