@@ -63,9 +63,9 @@ int main()
 			printf("Data: %s\n", buf);
 
 			//parse buffer data and write to shared memory
-			data_string = buf;
-			data = std::stof(data_string.substr(5, 6));
-			dataIndex = data_string[3]-48;
+			d.Parse(buf);
+			data = d["data"].GetFloat();
+			dataIndex = d["sourceID"].GetInt();
 			*(shared_data + dataIndex) = data;
 
 			std::cout << *(shared_data + dataIndex) << ": shared_data \n";
