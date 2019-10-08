@@ -96,10 +96,6 @@ int main()
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
 		
-		for (int i = 0; i < 127; i++) {
-			lastFrameData[i] = inData[i];
-		}
-
 		// Read incoming data from shared memory
 		using namespace boost::interprocess;
 		try {
@@ -111,10 +107,6 @@ int main()
 		}
 		catch (interprocess_exception e) {
 			std::cout << e.what() << '\n';
-		}
-
-		for (int i = 0; i < 127; i++) {
-			if (lastFrameData[i] > inData[i] && lastFrameData[i] > 50) inData[i] = lastFrameData [i] - 50;
 		}
 
 		//	FPS counter
