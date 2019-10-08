@@ -51,6 +51,10 @@ int main()
 			//clear the buffer by filling null, it might have previously received data
 			memset(buf, '\0', BUFLEN);
 
+			for (int i = 0; i < 127; i++) {
+				last_packet_data[i] = *(shared_data + i);
+			}
+
 			//try to receive some data, this is a blocking call
 			if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) & si_other, &slen)) == SOCKET_ERROR)
 			{
@@ -66,11 +70,10 @@ int main()
 			d.Parse(buf);
 			data = d["data"].GetFloat();
 			dataIndex = d["sourceID"].GetInt();
+			smoothingAmount = d["smoothing"].GetInt();
+			smoothing = (200 / pow(smoothingAmount, 0.3)) - 40;
+			if (smoothingAmount>0 && last_packet_data[dataIndex] > data && last_packet_data[dataIndex] > 50) data = last_packet_data[dataIndex] - smoothing; 
 			*(shared_data + dataIndex) = data;
-
-			std::cout << *(shared_data + dataIndex) << ": shared_data \n";
-			std::cout << dataIndex << ": dataIndex\n";
-
 
 			//now reply the client with the same data
 			if (sendto(s, buf, recv_len, 0, (struct sockaddr*) & si_other, slen) == SOCKET_ERROR)

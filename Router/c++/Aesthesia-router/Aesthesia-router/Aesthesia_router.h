@@ -17,4 +17,7 @@ rapidjson::Document d;
 std::string data_string;
 float data;
 int dataIndex;
+int smoothingAmount;
+float smoothing;
+float last_packet_data[128];
 WSADATA wsa;
