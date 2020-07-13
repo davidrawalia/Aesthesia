@@ -1,41 +1,39 @@
-// Aesthesia-router.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include "pch.h"
 #include "Aesthesia_router.h"
 
 int main()
 {
-	slen = sizeof(si_other);
-
 	//Initialise winsock
-	printf("\nInitialising Winsock...");
+	std::cout << "Initialising Winsock"; 
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 	{
-		printf("Failed.Error Code : %d", WSAGetLastError());
+		std::cout << "\nFailed.Error Code : " << WSAGetLastError();
 		exit(EXIT_FAILURE);
 	}
-	printf("Initialised.\n");
+	std::cout << ("\nInitialised.");
 
 	//Create a socket
-	if ((s = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
+	if ((udp_socket = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 	{
-		printf("Could not create socket : %d", WSAGetLastError());
+		std::cout << "Could not create socket : " << WSAGetLastError();
 	}
-	printf("Socket created.\n");
+	std::cout << "Socket created.\n";
 
 	//Prepare the sockaddr_in structure
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons(PORT);
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = INADDR_ANY;
+	server_addr.sin_port = htons(PORT);
 
 	//Bind
-	if (bind(s, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR)
+	if (bind(	udp_socket,
+				(struct sockaddr *)&server_addr, 
+				sizeof(server_addr)) 
+		== SOCKET_ERROR)
 	{
-		printf("Bind failed with error code : %d", WSAGetLastError());
+		std::cout << "Bind failed with error code : " << WSAGetLastError();
 		exit(EXIT_FAILURE);
 	}
-	puts(" Bind done");
+	std::cout << "Bind done";
 
 	//Create shared memory to route data to visualizer  
 	using namespace boost::interprocess;
@@ -49,38 +47,48 @@ int main()
 		while (1)
 		{
 			//clear the buffer by filling null, it might have previously received data
-			memset(buf, '\0', BUFLEN);
+			memset(buffer, '\0', BUFFER_LEN);
 
 			for (int i = 0; i < 127; i++) {
 				last_packet_data[i] = *(shared_data + i);
 			}
 
 			//try to receive some data, this is a blocking call
-			if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) & si_other, &slen)) == SOCKET_ERROR)
+			if ((packet_len = recvfrom(udp_socket, 
+									   buffer,
+									   BUFFER_LEN, 
+									   0, 
+								       (struct sockaddr*) &client_addr, 
+					                   &client_addr_len)) 
+				 == SOCKET_ERROR)
 			{
-				printf("recvfrom() failed with error code : %d", WSAGetLastError());
+				std::cout << "recvfrom() failed with error code: " << WSAGetLastError();
 				exit(EXIT_FAILURE);
 			}
+			inet_ntop(AF_INET, &(client_addr.sin_addr), source_IP, INET_ADDRSTRLEN);
+
 
 			//print details of the client/peer and the data received
-			printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-			printf("Data: %s\n", buf);
+			std::cout << "Received packet from " << source_IP << ": "
+					  << ntohs(client_addr.sin_port) << "\n" << "Data: " 
+					  << buffer << "\n";
 
 			//parse buffer data and write to shared memory
-			d.Parse(buf);
-			data = d["data"].GetFloat();
-			dataIndex = d["sourceID"].GetInt();
-			smoothingAmount = d["smoothing"].GetInt();
-			smoothing = (200 / pow(smoothingAmount, 0.3)) - 40;
-			if (smoothingAmount>0 && last_packet_data[dataIndex] > data && last_packet_data[dataIndex] > 50) data = last_packet_data[dataIndex] - smoothing; 
-			*(shared_data + dataIndex) = data;
+			document.Parse(buffer);
+			amplitude = document["data"].GetFloat();
+			data_index = document["sourceID"].GetInt();
 
-			//now reply the client with the same data
-			if (sendto(s, buf, recv_len, 0, (struct sockaddr*) & si_other, slen) == SOCKET_ERROR)
+			//smooth data
+			smoothing_value = document["smoothing"].GetInt();
+			smoothing_subtractor = (200 / pow(smoothing_value, 0.3)) - 40;
+			if (smoothing_value > 0 && last_packet_data[data_index] > amplitude
+				&& last_packet_data[data_index] > 50)
 			{
-				printf("sendto() failed with error code : %d", WSAGetLastError());
-				exit(EXIT_FAILURE);
+				amplitude = last_packet_data[data_index] - smoothing_subtractor;
 			}
+			
+			//write data to shared memory
+			*(shared_data + data_index) = amplitude;
 		}
 
 		//Destroy shared memory  
@@ -91,7 +99,7 @@ int main()
 		std::cout << e.what() << '\n';
 	}
 
-	closesocket(s);
+	closesocket(udp_socket);
 	WSACleanup();
 
 	return 0;

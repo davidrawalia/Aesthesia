@@ -1,23 +1,20 @@
 #pragma once
 
-// Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
-#pragma comment (lib, "Ws2_32.lib")
-#pragma comment (lib, "Mswsock.lib")
-#pragma comment (lib, "AdvApi32.lib")
-#pragma warning(disable:4996)
-
-#define BUFLEN 512
+#define BUFFER_LEN 512
 #define PORT 7474
 
-SOCKET s;
-struct sockaddr_in server, si_other;
-int slen, recv_len;
-char buf[BUFLEN];
-rapidjson::Document d;
-std::string data_string;
-float data;
-int dataIndex;
-int smoothingAmount;
-float smoothing;
-float last_packet_data[128];
+SOCKET udp_socket;
+struct sockaddr_in server_addr;
+struct sockaddr_in client_addr;
+int client_addr_len = sizeof(client_addr);
+int packet_len;
+char buffer[BUFFER_LEN];
+char source_IP[INET_ADDRSTRLEN];
 WSADATA wsa;
+
+rapidjson::Document document;
+float amplitude;
+int data_index;
+int smoothing_value;
+double smoothing_subtractor;
+float last_packet_data[128];
