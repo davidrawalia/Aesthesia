@@ -30,6 +30,7 @@ glm::vec3 modelColor = glm::vec3(1.0f, 1.0f, 1.0f);
 glm::vec3 cameraPosition;
 glm::mat4 worldTransform;
 glm::mat4 meshTransform;
+aiColor3D materialColor(0.f, 0.f, 0.f);
 
 GLfloat lastX = WIN_WIDTH / 2.0f;
 GLfloat lastY = WIN_WIDTH / 2.0f;

@@ -25,7 +25,7 @@ int main()
 	glUseProgram(shader.getProgramID());
 
 	// Importing scene
-	// TODO: Abstract out to a class, add material supports
+	// TODO: Abstract out to a class, add texture support
 	Assimp::Importer importer;
 
 	// And have it read the given file with some example postprocessing
@@ -106,6 +106,13 @@ int main()
 	}
 	*/
 
+	// Extract texture materials
+	std::vector<GLuint> materialIndices;
+
+	for (int i = 0; i < scene->mNumMeshes; i++) {
+		materialIndices.push_back(scene->mMeshes[i]->mMaterialIndex);
+	}
+	
 	// Mesh VBO and VAO binding
 	// TODO: make a loop to have one VAO per mesh
 	std::vector<GLuint> VAO, VBO, normVBO, texVBO, EBO;
@@ -204,27 +211,32 @@ int main()
 		// Clear buffers 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// Apply world transformation
+
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform3fv(cameraPositionLoc, 1, glm::value_ptr(cameraPosition));
 		glUniform1f(textureBoolLoc, textureBool);
 
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(worldTransform));
 		glUniform3fv(lightLoc, 1, glm::value_ptr(lightWorldPos));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, 
-						   glm::value_ptr(worldTransform));
-		glUniform3fv(colorLoc, 1, glm::value_ptr(modelColor));
 		glUniform1f(ambLightLoc, ambLight);
 
 		// Bind vertex array and render scene
 		for (int i = 0; i < scene->mNumMeshes; i++) {
 			glBindVertexArray(VAO[i]);
 
+			scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_DIFFUSE, materialColor);
+			modelColor = glm::vec3(materialColor.r, materialColor.g, materialColor.b);
+			std::cout << modelColor.r << ", " << modelColor.g << ", " << modelColor.b << "\n";
+			glUniform3fv(colorLoc, 1, glm::value_ptr(modelColor));
+
 			// Apply transformations to the mesh
 			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
 			meshTransform = glm::scale(meshTransform, glm::vec3(
-				5.0f + inData[i]  *0.05, 
-				5.0f + inData[i] * 0.05, 
-				5.0f + inData[i] * 0.05));
+				5.0f + inData[i]  *0.075, 
+				5.0f + inData[i] * 0.075, 
+				5.0f + inData[i] * 0.075));
 			meshTransform = worldTransform * meshTransform;
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(meshTransform));
 
