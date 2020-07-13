@@ -7,7 +7,8 @@ int main()
 		return -1;
 	}
 
-	//	Shader setup
+	// Shader setup
+	// TODO: abstract out to the shader class
 	Shader shader = Shader("vertex.shader", "fragment.shader");
 	GLint modelLoc = glGetUniformLocation(shader.getProgramID(), "model");
 	GLint viewLoc = glGetUniformLocation(shader.getProgramID(), "view");
@@ -21,13 +22,16 @@ int main()
 		"cameraPosition");
 	GLint textureBoolLoc = glGetUniformLocation(shader.getProgramID(),
 		"textureBool");
+	glUseProgram(shader.getProgramID());
 
 	// Importing scene
+	// TODO: Abstract out to a class, add material supports
 	Assimp::Importer importer;
 
 	// And have it read the given file with some example postprocessing
 	// Usually - if speed is not the most important aspect for you - you'll
 	// probably to request more postprocessing than we do in this example.
+	// TODO: prompt user with an open dialog box to get obj file path
 	const aiScene* scene = importer.ReadFile("C:\\Users\\David\\Documents\\Perso\\Wally\\logo 3d\\wally logo_001.obj",
 		aiProcess_Triangulate |
 		aiProcess_ValidateDataStructure |
@@ -39,71 +43,60 @@ int main()
 	}
 
 	// Extract vertex coordinates
-	std::vector<glm::vec3> meshesVertices;
+	std::vector<std::vector<glm::vec3>> meshesVertices;
 	int numVertices = 0;
 
 	for (int i = 0; i < scene->mNumMeshes; i++) {
+		std::vector<glm::vec3> meshVetices;
 		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-			meshesVertices.push_back(glm::vec3(
+			meshVetices.push_back(glm::vec3(
 				scene->mMeshes[i]->mVertices[j].x,
 				scene->mMeshes[i]->mVertices[j].y,
 				scene->mMeshes[i]->mVertices[j].z));
 			numVertices++;
-			std:: cout << "v" << j << ": " << 
-				scene->mMeshes[i]->mVertices[j].x << ", " <<
-				scene->mMeshes[i]->mVertices[j].y << ", " <<
-				scene->mMeshes[i]->mVertices[j].z << "\n ";
 		}
+		meshesVertices.push_back(meshVetices);
 	}
 
-	std::cout << "numVertices: "  << numVertices << "\n";
-	std::cout << "calculated numVertices: " << scene->mMeshes[0]->mNumVertices + scene->mMeshes[1]->mNumVertices << "\n";
-
 	// Extract indices (assimp doesn't support vertex joins so indices are in order)
-	std::vector<GLuint> meshesIndices;
+	std::vector<std::vector<GLuint>> meshesIndices;
 	int numIndices = 0;
 
 	for (int i = 0; i < scene->mNumMeshes; i++) {
+		std::vector<GLuint> meshIndices;
 		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; j++) {
-			meshesIndices.push_back(numIndices);
-			numIndices++;
-			meshesIndices.push_back(numIndices);
-			numIndices++;
-			meshesIndices.push_back(numIndices);
-			numIndices++;
+			meshIndices.push_back(3 * j);
+			meshIndices.push_back(3 * j + 1);
+			meshIndices.push_back(3 * j + 2);
 		}
+		meshesIndices.push_back(meshIndices);
 	}
 
-	std::cout << "numIndices: " << numIndices << "\n";
-	std::cout << "calculated numIndices: " << scene->mMeshes[0]->mNumFaces * 3 + scene->mMeshes[1]->mNumFaces * 3 << "\n";
-
-
 	// Extract normals
-	std::vector<glm::vec3> meshesNormals;
+	std::vector<std::vector<glm::vec3>> meshesNormals;
 	int numNormals = 0;
 
 	for (int i = 0; i < scene->mNumMeshes; i++) {
+		std::vector<glm::vec3> meshNormals;
 		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-			meshesNormals.push_back(glm::vec3(
+			meshNormals.push_back(glm::vec3(
 				scene->mMeshes[i]->mNormals[j].x,
 				scene->mMeshes[i]->mNormals[j].y,
 				scene->mMeshes[i]->mNormals[j].z));
 			numNormals++;
 		}
+		meshesNormals.push_back(meshNormals);
 	}
 
-	std::cout << "numNormals: " << numNormals << "\n";
-	std::cout << "canumNormals: " << scene->mMeshes[0]->mNumVertices + scene->mMeshes[1]->mNumVertices << "\n";
-
 	// Extract texture coordinates
-
-	std::vector<glm::vec2> meshesTexCoords;
+	std::vector<std::vector<glm::vec2>> meshesTexCoords;
 
 	/*
 	if (scene->HasTextures){
 		for (int i = 0; i < scene->mNumMeshes; i++) {
+			std::vector<glm::vec2> meshTexCoords;
 			for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-				meshesTexCoords.push_back(glm::vec2(
+				meshTexCoords.push_back(glm::vec2(
 					scene->mMeshes[i]->mTextureCoords[0]->x,
 					scene->mMeshes[i]->mTextureCoords[0]->y)
 				);
@@ -113,47 +106,60 @@ int main()
 	}
 	*/
 
-	//	Mesh VBO and VAO binding
-	GLuint VBO, VAO, normVBO, texVBO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	glGenBuffers(1, &VBO);
+	// Mesh VBO and VAO binding
+	// TODO: make a loop to have one VAO per mesh
+	std::vector<GLuint> VAO, VBO, normVBO, texVBO, EBO;
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(glm::vec3),
-		&meshesVertices[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(0);
+	for(int i = 0; i < scene->mNumMeshes; i++){
+		VBO.push_back(*new GLuint);
+		VAO.push_back(*new GLuint);
+		normVBO.push_back(*new GLuint);
+		texVBO.push_back(*new GLuint);
+		EBO.push_back(*new GLuint);
 
-	glGenBuffers(1, &normVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, normVBO);
-	glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(glm::vec3),
-		&meshesNormals[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
+		glGenVertexArrays(1, &VAO[i]);
+		glBindVertexArray(VAO[i]);
 
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(GLuint),
-		&meshesIndices.front(), GL_DYNAMIC_DRAW);
+		glGenBuffers(1, &VBO[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
+		glBufferData(GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(glm::vec3),
+			&meshesVertices[i][0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(0);
+
+		glGenBuffers(1, &normVBO[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, normVBO[i]);
+		glBufferData(GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(glm::vec3),
+			&meshesNormals[i][0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(1);
+
+		glGenBuffers(1, &EBO[i]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[i]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(GLuint),
+			&meshesIndices[i][0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(2, 1, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(2);
 	
-	/*
-	glGenBuffers(1, &texVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, texVBO);
-	glBufferData(GL_ARRAY_BUFFER, texCoord.size() * sizeof(glm::vec2),
-		&texCoord[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(2);
-	*/
+		/*
+		glGenBuffers(1, &texVBO[i]);
+		glBindBuffer(GL_ARRAY_BUFFER, texVBO[i]);
+		glBufferData(GL_ARRAY_BUFFER, texCoord.size() * sizeof(glm::vec2),
+			&texCoord[0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(3);
+		*/
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
 
 
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
 		
 		// Read incoming data from shared memory
+		// TODO: abstract this to it's own object
 		using namespace boost::interprocess;
 		try {
 			managed_shared_memory segment(open_only, "shared_memory");
@@ -166,7 +172,8 @@ int main()
 			std::cout << e.what() << '\n';
 		}
 
-		//	FPS counter
+		// FPS counter
+		// TODO: abstract this to it's own object
 		GLdouble currentTime = glfwGetTime();
 		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
@@ -179,67 +186,62 @@ int main()
 			lastTime += 1.0;
 		}
 
-		//	Event polling
+		// Event polling
 		glfwPollEvents();
 		doMovement();
 
-		glClearColor(*redbk, *greenbk, *bluebk, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glm::vec3 light = glm::vec3(5.0f, 20.0f, 5.0f);	// *** LIGHT COORDS ***
-
-		glm::mat4 projection = glm::perspective(camera.GetZoom(), 
+		// Update transformation matrices 
+		projection = glm::perspective(camera.GetZoom(), 
 												(GLfloat)width/(GLfloat)height, 
 											    0.1f, 1000.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::vec3 color;
-		glm::vec3 cameraPosition = camera.getPosition();
-		glm::mat4 worldTransform;
-
+		view = camera.GetViewMatrix();
+		cameraPosition = camera.getPosition();
+		worldTransform = glm::mat4(1.0f);
 		worldTransform = glm::rotate(worldTransform, -worldXRotation, right);
 		worldTransform = glm::rotate(worldTransform, worldYRotation, up);
-		light = worldTransform * glm::vec4(light, 1.0f);
+		lightWorldPos = worldTransform * glm::vec4(lightModelPos, 1.0f);
 
-		// Render scene
-		glViewport(0, 0, width, height);
+		// Clear buffers 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(shader.getProgramID());
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform3fv(cameraPositionLoc, 1, glm::value_ptr(cameraPosition));
 		glUniform1f(textureBoolLoc, textureBool);
 
-		glUniform3fv(lightLoc, 1, glm::value_ptr(light));
+		glUniform3fv(lightLoc, 1, glm::value_ptr(lightWorldPos));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, 
 						   glm::value_ptr(worldTransform));
-
-		// Drawing cube
-		color = glm::vec3(1.0f, 1.0f, 1.0f);
-		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
-		ambLight = 0.1f;
+		glUniform3fv(colorLoc, 1, glm::value_ptr(modelColor));
 		glUniform1f(ambLightLoc, ambLight);
-		glBindVertexArray(VAO);
-		glPolygonMode(GL_FRONT_AND_BACK, renderMode);
 
-		glm::mat4 cubeTransform = glm::translate(glm::mat4(), 
-												 glm::vec3(0.0f, 0.0f, 0.0f));
-		cubeTransform = glm::scale(cubeTransform, glm::vec3(5.0f, 5.0f, 5.0f));		
-//		cubeTransform = glm::scale(cubeTransform, glm::vec3(inData[0]*0.1, 
-//								   5, 5.0f));
-		cubeTransform = worldTransform * cubeTransform;
+		// Bind vertex array and render scene
+		for (int i = 0; i < scene->mNumMeshes; i++) {
+			glBindVertexArray(VAO[i]);
 
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, 
-						   glm::value_ptr(cubeTransform));
-		glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, nullptr);
-			
-		glBindVertexArray(0);
+			// Apply transformations to the mesh
+			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
+			meshTransform = glm::scale(meshTransform, glm::vec3(
+				5.0f + inData[i]  *0.05, 
+				5.0f + inData[i] * 0.05, 
+				5.0f + inData[i] * 0.05));
+			meshTransform = worldTransform * meshTransform;
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(meshTransform));
+
+			glDrawElements(GL_TRIANGLES, scene->mMeshes[i]->mNumVertices, GL_UNSIGNED_INT, nullptr);
+			glBindVertexArray(0);
+		}
 		glfwSwapBuffers(window);
 	}
 
 	// Properly de-allocate all resources once they've outlived their purpose
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	for (int i = 0; i < scene->mNumMeshes; i++) {
+		glDeleteVertexArrays(1, &VAO[i]);
+		glDeleteBuffers(1, &VBO[i]);
+		glDeleteBuffers(1, &normVBO[i]);
+		glDeleteBuffers(1, &texVBO[i]);
+		glDeleteBuffers(1, &EBO[i]);
+	}
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
@@ -300,7 +302,11 @@ int init() {
 	// size of points when in point view mode
 	glPointSize(5.0);
 	// disable rendering of faces pointing away from camera
-//	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
+	// Define polygon rendering mode
+	glPolygonMode(GL_FRONT_AND_BACK, renderMode);
+	// Set background color to greenscreen green
+	glClearColor(*redbk, *greenbk, *bluebk, 1.0f);
 }
 
 void doMovement() {
