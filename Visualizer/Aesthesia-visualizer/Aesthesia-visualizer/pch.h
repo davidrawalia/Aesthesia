@@ -1,15 +1,19 @@
-#ifndef PCH_H
-#define PCH_H
+#pragma once
 
 #include "targetver.h"
-#include "/libs/glew-2.1.0/include/GL/glew.h"
-#include "/libs/glfw-3.2.1.bin.WIN32/include/GLFW/glfw3.h"
-#include "/libs/glm/glm/glm.hpp"
-#include "/libs/glm/glm/gtc/matrix_transform.hpp"
-#include "/libs/glm/glm/gtc/type_ptr.hpp"
-#include "/libs/glm/glm/gtx/rotate_vector.hpp"
-#include "/libs/glm/glm/gtx/normal.hpp"
-#include "/libs/soil2/src/SOIL2/SOIL2.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/normal.hpp>
+#include <SOIL2/SOIL2.h>
+#include <assimp/Importer.hpp> // C++ importer interface
+#include <assimp/scene.h> // Output data structure
+#include <assimp/postprocess.h> // Post processing flags
+#include <assimp/DefaultLogger.hpp>
+#include <assimp/Logger.hpp>
 #include <exception>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -26,5 +30,3 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <stdlib.h>
-
-#endif
