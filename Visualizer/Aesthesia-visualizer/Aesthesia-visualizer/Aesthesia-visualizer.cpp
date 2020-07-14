@@ -43,9 +43,6 @@ int main()
 	}
 
 	// Extract vertex coordinates
-	std::vector<std::vector<glm::vec3>> meshesVertices;
-	int numVertices = 0;
-
 	for (int i = 0; i < scene->mNumMeshes; i++) {
 		std::vector<glm::vec3> meshVetices;
 		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
@@ -59,9 +56,6 @@ int main()
 	}
 
 	// Extract indices (assimp doesn't support vertex joins so indices are in order)
-	std::vector<std::vector<GLuint>> meshesIndices;
-	int numIndices = 0;
-
 	for (int i = 0; i < scene->mNumMeshes; i++) {
 		std::vector<GLuint> meshIndices;
 		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; j++) {
@@ -73,9 +67,6 @@ int main()
 	}
 
 	// Extract normals
-	std::vector<std::vector<glm::vec3>> meshesNormals;
-	int numNormals = 0;
-
 	for (int i = 0; i < scene->mNumMeshes; i++) {
 		std::vector<glm::vec3> meshNormals;
 		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
@@ -83,13 +74,11 @@ int main()
 				scene->mMeshes[i]->mNormals[j].x,
 				scene->mMeshes[i]->mNormals[j].y,
 				scene->mMeshes[i]->mNormals[j].z));
-			numNormals++;
 		}
 		meshesNormals.push_back(meshNormals);
 	}
 
 	// Extract texture coordinates
-	std::vector<std::vector<glm::vec2>> meshesTexCoords;
 
 	/*
 	if (scene->HasTextures){
@@ -107,11 +96,13 @@ int main()
 	*/
 
 	// Extract texture materials
-	std::vector<GLuint> materialIndices;
-
 	for (int i = 0; i < scene->mNumMeshes; i++) {
 		materialIndices.push_back(scene->mMeshes[i]->mMaterialIndex);
+		scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_DIFFUSE, materialColor);
+		modelColor.push_back(glm::vec3(materialColor.r, materialColor.g, materialColor.b));
 	}
+
+
 	
 	// Mesh VBO and VAO binding
 	// TODO: make a loop to have one VAO per mesh
@@ -226,10 +217,7 @@ int main()
 		for (int i = 0; i < scene->mNumMeshes; i++) {
 			glBindVertexArray(VAO[i]);
 
-			scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_DIFFUSE, materialColor);
-			modelColor = glm::vec3(materialColor.r, materialColor.g, materialColor.b);
-			std::cout << modelColor.r << ", " << modelColor.g << ", " << modelColor.b << "\n";
-			glUniform3fv(colorLoc, 1, glm::value_ptr(modelColor));
+			glUniform3fv(colorLoc, 1, glm::value_ptr(modelColor[i]));
 
 			// Apply transformations to the mesh
 			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
