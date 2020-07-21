@@ -25,17 +25,17 @@ int main()
 	glUseProgram(shader.getProgramID());
 
 	// Importing scene
-	// TODO: Abstract out to a class, add texture support
+	// TODO: Abstract out to a mesh class
 	Assimp::Importer importer;
 
 	// And have it read the given file with some example postprocessing
 	// Usually - if speed is not the most important aspect for you - you'll
 	// probably to request more postprocessing than we do in this example.
 	// TODO: prompt user with an open dialog box to get obj file path
-	const aiScene* scene = importer.ReadFile("C:\\Users\\David\\Documents\\Perso\\Wally\\logo 3d\\wally logo_001.obj",
-		aiProcess_Triangulate |
-		aiProcess_ValidateDataStructure |
-		aiProcess_GenNormals
+	std::string assetDir = "C:\\Users\\David\\Documents\\Perso\\Wally\\logo 3d\\";
+	std::string objFile = "wally logo_003.obj";
+	const aiScene* scene = importer.ReadFile(assetDir + objFile,
+		aiProcessPreset_TargetRealtime_MaxQuality
 	);
 	// If the import failed, report it
 	if (!scene) {
@@ -55,13 +55,13 @@ int main()
 		meshesVertices.push_back(meshVetices);
 	}
 
-	// Extract indices (assimp doesn't support vertex joins so indices are in order)
+	// Extract indices
 	for (int i = 0; i < scene->mNumMeshes; i++) {
 		std::vector<GLuint> meshIndices;
 		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; j++) {
-			meshIndices.push_back(3 * j);
-			meshIndices.push_back(3 * j + 1);
-			meshIndices.push_back(3 * j + 2);
+			meshIndices.push_back(scene->mMeshes[i]->mFaces[j].mIndices[0]);
+			meshIndices.push_back(scene->mMeshes[i]->mFaces[j].mIndices[1]);
+			meshIndices.push_back(scene->mMeshes[i]->mFaces[j].mIndices[2]);
 		}
 		meshesIndices.push_back(meshIndices);
 	}
@@ -79,31 +79,39 @@ int main()
 	}
 
 	// Extract texture coordinates
-
-	/*
-	if (scene->HasTextures){
-		for (int i = 0; i < scene->mNumMeshes; i++) {
-			std::vector<glm::vec2> meshTexCoords;
-			for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-				meshTexCoords.push_back(glm::vec2(
-					scene->mMeshes[i]->mTextureCoords[0]->x,
-					scene->mMeshes[i]->mTextureCoords[0]->y)
-				);
-			}
-			meshesTexCoords.push_back(meshTexCoords);
+	for (int i = 0; i < scene->mNumMeshes; i++) {
+		std::vector<glm::vec2> meshTexCoords;
+		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
+			meshTexCoords.push_back(glm::vec2(
+				scene->mMeshes[i]->mTextureCoords[0][j].x,
+				scene->mMeshes[i]->mTextureCoords[0][j].y)
+			);
 		}
+		meshesTexCoords.push_back(meshTexCoords);
 	}
-	*/
 
-	// Extract texture materials
+	// Extract material indices per mesh
 	for (int i = 0; i < scene->mNumMeshes; i++) {
 		materialIndices.push_back(scene->mMeshes[i]->mMaterialIndex);
 		scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_DIFFUSE, materialColor);
 		modelColor.push_back(glm::vec3(materialColor.r, materialColor.g, materialColor.b));
 	}
 
+	// Extract texture file paths
+	// TODO: Abstract out to a material class
+	for (int i = 0; i < scene->mNumMaterials; i++) {
+		aiString* textureFilePath = new aiString;
+		scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFilePath);
+		texturesFilePaths.push_back(assetDir + textureFilePath->data);
+		tex_2d.push_back(SOIL_load_OGL_texture
+		(
+			"texturesFilePaths[i]",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS
+		));
+	}
 
-	
 	// Mesh VBO and VAO binding
 	// TODO: make a loop to have one VAO per mesh
 	std::vector<GLuint> VAO, VBO, normVBO, texVBO, EBO;
@@ -134,24 +142,21 @@ int main()
 
 		glGenBuffers(1, &EBO[i]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[i]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(GLuint),
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, scene->mMeshes[i]->mNumFaces * 3 * sizeof(GLuint),
 			&meshesIndices[i][0], GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(2, 1, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(2);
-	
-		/*
+
 		glGenBuffers(1, &texVBO[i]);
 		glBindBuffer(GL_ARRAY_BUFFER, texVBO[i]);
-		glBufferData(GL_ARRAY_BUFFER, texCoord.size() * sizeof(glm::vec2),
-			&texCoord[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(glm::vec2),
+			&meshesTexCoords[i][0], GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(3);
-		*/
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
-
 
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
@@ -228,7 +233,7 @@ int main()
 			meshTransform = worldTransform * meshTransform;
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(meshTransform));
 
-			glDrawElements(GL_TRIANGLES, scene->mMeshes[i]->mNumVertices, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, scene->mMeshes[i]->mNumFaces * 3, GL_UNSIGNED_INT, nullptr);
 			glBindVertexArray(0);
 		}
 		glfwSwapBuffers(window);
@@ -302,7 +307,7 @@ int init() {
 	// size of points when in point view mode
 	glPointSize(5.0);
 	// disable rendering of faces pointing away from camera
-	glEnable(GL_CULL_FACE);
+	// pglEnable(GL_CULL_FACE);
 	// Define polygon rendering mode
 	glPolygonMode(GL_FRONT_AND_BACK, renderMode);
 	// Set background color to greenscreen green

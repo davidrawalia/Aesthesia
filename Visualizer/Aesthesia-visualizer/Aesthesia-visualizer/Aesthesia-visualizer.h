@@ -35,7 +35,9 @@ std::vector<std::vector<glm::vec3>> meshesVertices;
 std::vector<std::vector<GLuint>> meshesIndices;
 std::vector<std::vector<glm::vec3>> meshesNormals;
 std::vector<std::vector<glm::vec2>> meshesTexCoords;
+std::vector<std::string> texturesFilePaths;
 std::vector<GLuint> materialIndices;
+std::vector<GLuint> tex_2d;
 int numVertices = 0;
 
 GLfloat lastX = WIN_WIDTH / 2.0f;
