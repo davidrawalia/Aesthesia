@@ -22,7 +22,7 @@ GLdouble lastTime = glfwGetTime();
 GLuint nbFrames = 0;
 Camera camera = Camera(0.0f, 30.0f, 0.0f, 0.0f, 1.0f, 0.0f, -90.0f, -89.0f);
 GLfloat ambLight = 0.1f;
-glm::vec3 lightModelPos = glm::vec3(5.0f, 20.0f, 5.0f);
+glm::vec3 lightModelPos = glm::vec3(10.0f, 15.0f, 10.0f);
 glm::vec3 lightWorldPos = glm::vec3(5.0f, 20.0f, 5.0f);
 glm::mat4 projection;
 glm::mat4 view;
@@ -35,10 +35,11 @@ std::vector<std::vector<glm::vec3>> meshesVertices;
 std::vector<std::vector<GLuint>> meshesIndices;
 std::vector<std::vector<glm::vec3>> meshesNormals;
 std::vector<std::vector<glm::vec2>> meshesTexCoords;
-std::vector<std::string> texturesFilePaths;
 std::vector<GLuint> materialIndices;
-std::vector<GLuint> tex_2d;
-int numVertices = 0;
+std::vector<GLuint> textures;
+std::vector<int> texWidths;
+std::vector<int> texHeights;
+
 
 GLfloat lastX = WIN_WIDTH / 2.0f;
 GLfloat lastY = WIN_WIDTH / 2.0f;

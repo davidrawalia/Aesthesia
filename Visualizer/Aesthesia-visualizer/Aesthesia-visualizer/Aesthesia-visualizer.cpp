@@ -32,8 +32,8 @@ int main()
 	// Usually - if speed is not the most important aspect for you - you'll
 	// probably to request more postprocessing than we do in this example.
 	// TODO: prompt user with an open dialog box to get obj file path
-	std::string assetDir = "C:\\Users\\David\\Documents\\Perso\\Wally\\logo 3d\\";
-	std::string objFile = "wally logo_003.obj";
+	std::string assetDir = "C:\\Users\\David\\Documents\\Perso\\stockpile\\2020-07-29\\";
+	std::string objFile = "ramen.obj";
 	const aiScene* scene = importer.ReadFile(assetDir + objFile,
 		aiProcessPreset_TargetRealtime_MaxQuality
 	);
@@ -50,7 +50,6 @@ int main()
 				scene->mMeshes[i]->mVertices[j].x,
 				scene->mMeshes[i]->mVertices[j].y,
 				scene->mMeshes[i]->mVertices[j].z));
-			numVertices++;
 		}
 		meshesVertices.push_back(meshVetices);
 	}
@@ -97,23 +96,7 @@ int main()
 		modelColor.push_back(glm::vec3(materialColor.r, materialColor.g, materialColor.b));
 	}
 
-	// Extract texture file paths
-	// TODO: Abstract out to a material class
-	for (int i = 0; i < scene->mNumMaterials; i++) {
-		aiString* textureFilePath = new aiString;
-		scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFilePath);
-		texturesFilePaths.push_back(assetDir + textureFilePath->data);
-		tex_2d.push_back(SOIL_load_OGL_texture
-		(
-			"texturesFilePaths[i]",
-			SOIL_LOAD_AUTO,
-			SOIL_CREATE_NEW_ID,
-			SOIL_FLAG_MIPMAPS
-		));
-	}
-
 	// Mesh VBO and VAO binding
-	// TODO: make a loop to have one VAO per mesh
 	std::vector<GLuint> VAO, VBO, normVBO, texVBO, EBO;
 
 	for(int i = 0; i < scene->mNumMeshes; i++){
@@ -140,24 +123,77 @@ int main()
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(1);
 
-		glGenBuffers(1, &EBO[i]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[i]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, scene->mMeshes[i]->mNumFaces * 3 * sizeof(GLuint),
-			&meshesIndices[i][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(2, 1, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(2);
-
 		glGenBuffers(1, &texVBO[i]);
 		glBindBuffer(GL_ARRAY_BUFFER, texVBO[i]);
 		glBufferData(GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(glm::vec2),
 			&meshesTexCoords[i][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(2);
+
+		glGenBuffers(1, &EBO[i]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[i]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, scene->mMeshes[i]->mNumFaces * 3 * sizeof(GLuint),
+			&meshesIndices[i][0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(3, 1, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(3);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 
+	// Extract texture file paths
+	// TODO: Abstract out to a material class
+	for (int i = 0; i < scene->mNumMaterials; i++) {
+		aiString* textureFilePath = new aiString;
+		scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFilePath);
+
+		textures.push_back(*new GLuint);
+		texWidths.push_back(*new int);
+		texHeights.push_back(*new int);
+
+
+		glGenTextures(1, &textures[i]);
+		glBindTexture(GL_TEXTURE_2D, textures[i]);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		aiString* textureFileName = new aiString;
+		scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFileName);
+		std::string textureFileNameString = textureFileName->data;
+		std::string texturePath = assetDir + textureFileNameString;
+
+		unsigned char *image = SOIL_load_image(texturePath.c_str(), &texWidths[i], &texHeights[i], 0, SOIL_LOAD_RGBA);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidths[i], texHeights[i], 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		SOIL_free_image_data(image);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+/*	GLuint texture;
+
+	int texWidth, texHeight;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	aiString* textureFileName = new aiString;
+	scene->mMaterials[1]->GetTexture(aiTextureType_DIFFUSE, 0, textureFileName);
+	std::string textureFileNameString = textureFileName->data;
+	std::string texturePath = assetDir + textureFileNameString;
+
+	unsigned char *image = SOIL_load_image(texturePath.c_str(), &texWidth, &texHeight, 0, SOIL_LOAD_RGBA);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+*/
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
 		
@@ -220,6 +256,10 @@ int main()
 
 		// Bind vertex array and render scene
 		for (int i = 0; i < scene->mNumMeshes; i++) {
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, textures[i]);
+			glUniform1i(glGetUniformLocation(shader.getProgramID(), "meshTexture"), 0);
 			glBindVertexArray(VAO[i]);
 
 			glUniform3fv(colorLoc, 1, glm::value_ptr(modelColor[i]));
@@ -307,11 +347,14 @@ int init() {
 	// size of points when in point view mode
 	glPointSize(5.0);
 	// disable rendering of faces pointing away from camera
-	// pglEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	// Define polygon rendering mode
 	glPolygonMode(GL_FRONT_AND_BACK, renderMode);
 	// Set background color to greenscreen green
 	glClearColor(*redbk, *greenbk, *bluebk, 1.0f);
+	// enable texture alpha blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void doMovement() {

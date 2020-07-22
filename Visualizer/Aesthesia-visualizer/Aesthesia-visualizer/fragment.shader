@@ -8,7 +8,7 @@ in vec3 fragPosition;
 in vec3 outNormal;
 in vec3 outLight;
 in float outAmbLight;
-in vec2 outTex;
+in vec2 outTexCoord;
 in float textureBoolOut;
 in vec4 FragPosLightSpace;
 
@@ -16,7 +16,7 @@ out vec4 color;
 
 void main()
 {
-	vec3 cubeColour = vec3(outColor);
+	vec4 meshColour = texture(textureMap, outTexCoord);
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 	vec3 specularColor = vec3(1.0f, 1.0f, 1.0f);
 	float specularStrength = 0.5;
@@ -36,6 +36,6 @@ void main()
 	vec4 result_color = vec4(amb_contribution + (diffuse_contribution + specular_contribution), 1.0);
 
 
-	color = result_color * vec4(cubeColour, 1.0);
+	color = result_color * meshColour, 1.0;
 
 }
