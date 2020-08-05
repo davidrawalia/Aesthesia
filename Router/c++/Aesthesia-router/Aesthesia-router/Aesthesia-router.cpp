@@ -80,7 +80,7 @@ int main()
 
 			//smooth data
 			smoothing_value = document["smoothing"].GetInt();
-			smoothing_subtractor = (200 / pow(smoothing_value, 0.3)) - 40;
+			smoothing_subtractor = (200 / pow(smoothing_value, 0.4)) - 40;
 			if (smoothing_value > 0 && last_packet_data[data_index] > amplitude
 				&& last_packet_data[data_index] > 50)
 			{

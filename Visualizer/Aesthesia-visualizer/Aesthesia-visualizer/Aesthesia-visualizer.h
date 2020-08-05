@@ -8,11 +8,11 @@
 const bool debug = false;
 const bool fps_count = false;
 
-const GLuint WIN_WIDTH = 1000, WIN_HEIGHT = 1000;
+const GLuint WIN_WIDTH = 1920, WIN_HEIGHT = 1080;
 GLFWwindow* window;
 GLclampf* redbk = new GLclampf(0.0f);
-GLclampf* greenbk = new GLclampf(0.694f);
-GLclampf* bluebk = new GLclampf(0.251f);
+GLclampf* greenbk = new GLclampf(1.0f);
+GLclampf* bluebk = new GLclampf(0.0f);
 GLfloat worldYRotation = 0.0f;
 GLfloat worldXRotation = 0.0f;
 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -23,7 +23,7 @@ GLuint nbFrames = 0;
 Camera camera = Camera(0.0f, 30.0f, 0.0f, 0.0f, 1.0f, 0.0f, -90.0f, -89.0f);
 GLfloat ambLight = 0.1f;
 glm::vec3 lightModelPos = glm::vec3(10.0f, 15.0f, 10.0f);
-glm::vec3 lightWorldPos = glm::vec3(5.0f, 20.0f, 5.0f);
+glm::vec3 lightWorldPos;
 glm::mat4 projection;
 glm::mat4 view;
 aiColor3D materialColor = aiColor3D(0.0f, 0.0f, 0.0f);

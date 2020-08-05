@@ -358,7 +358,7 @@ int init() {
 }
 
 void doMovement() {
-	const GLfloat velocity = 1;
+	const GLfloat velocity = 0.2;
 
 	if (keys[GLFW_KEY_UP])
 	{
@@ -376,6 +376,16 @@ void doMovement() {
 	if (keys[GLFW_KEY_RIGHT])
 	{
 		worldYRotation -= velocity * deltaTime;
+	}
+	if (keys[GLFW_KEY_KP_8])
+	{
+		GLfloat movement = velocity * deltaTime * 50;
+		camera.ProcessMouseMovement(movement, movement, 0);
+	}
+	if (keys[GLFW_KEY_KP_2])
+	{
+		GLfloat movement = velocity * deltaTime * -50;
+		camera.ProcessMouseMovement(movement, movement, 0);
 	}
 };
 
