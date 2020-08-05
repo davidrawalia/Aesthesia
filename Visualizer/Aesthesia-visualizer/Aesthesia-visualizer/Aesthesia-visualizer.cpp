@@ -8,21 +8,7 @@ int main()
 	}
 
 	// Shader setup
-	// TODO: abstract out to the shader class
 	Shader shader = Shader("vertex.shader", "fragment.shader");
-	GLint modelLoc = glGetUniformLocation(shader.getProgramID(), "model");
-	GLint viewLoc = glGetUniformLocation(shader.getProgramID(), "view");
-	GLint projLoc = glGetUniformLocation(shader.getProgramID(),
-		"projection");
-	GLint lightLoc = glGetUniformLocation(shader.getProgramID(), "light");
-	GLint colorLoc = glGetUniformLocation(shader.getProgramID(), "color");
-	GLint ambLightLoc = glGetUniformLocation(shader.getProgramID(),
-		"ambLight");
-	GLint cameraPositionLoc = glGetUniformLocation(shader.getProgramID(),
-		"cameraPosition");
-	GLint textureBoolLoc = glGetUniformLocation(shader.getProgramID(),
-		"textureBool");
-	glUseProgram(shader.getProgramID());
 
 	// Importing scene
 	// TODO: Abstract out to a mesh class
@@ -245,14 +231,14 @@ int main()
 
 		// Apply world transformation
 
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(cameraPositionLoc, 1, glm::value_ptr(cameraPosition));
-		glUniform1f(textureBoolLoc, textureBool);
+		glUniformMatrix4fv(shader.getViewLoc(), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(shader.getProjLoc(), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform3fv(shader.getCameraPositionLoc(), 1, glm::value_ptr(cameraPosition));
+		glUniform1f(shader.getTextureBoolLoc(), textureBool);
 
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(worldTransform));
-		glUniform3fv(lightLoc, 1, glm::value_ptr(lightWorldPos));
-		glUniform1f(ambLightLoc, ambLight);
+		glUniformMatrix4fv(shader.getModelLoc(), 1, GL_FALSE, glm::value_ptr(worldTransform));
+		glUniform3fv(shader.getLightLoc(), 1, glm::value_ptr(lightWorldPos));
+		glUniform1f(shader.getAmbLightLoc(), ambLight);
 
 		// Bind vertex array and render scene
 		for (int i = 0; i < scene->mNumMeshes; i++) {
@@ -262,7 +248,7 @@ int main()
 			glUniform1i(glGetUniformLocation(shader.getProgramID(), "meshTexture"), 0);
 			glBindVertexArray(VAO[i]);
 
-			glUniform3fv(colorLoc, 1, glm::value_ptr(modelColor[i]));
+			glUniform3fv(shader.getColorLoc(), 1, glm::value_ptr(modelColor[i]));
 
 			// Apply transformations to the mesh
 			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -271,7 +257,7 @@ int main()
 				5.0f + inData[i] * 0.075, 
 				5.0f + inData[i] * 0.075));
 			meshTransform = worldTransform * meshTransform;
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(meshTransform));
+			glUniformMatrix4fv(shader.getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
 
 			glDrawElements(GL_TRIANGLES, scene->mMeshes[i]->mNumFaces * 3, GL_UNSIGNED_INT, nullptr);
 			glBindVertexArray(0);

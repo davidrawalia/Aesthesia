@@ -91,10 +91,54 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 		printf("%s\n", &ProgramErrorMessage[0]);
 	}
 
-	glDeleteShader(VertexShaderID); //free up memory
+	//free up memory
+	glDeleteShader(VertexShaderID); 
 	glDeleteShader(FragmentShaderID);
+
+	modelLoc = glGetUniformLocation(ProgramID, "model");
+	viewLoc = glGetUniformLocation(ProgramID, "view");
+	projLoc = glGetUniformLocation(ProgramID,
+		"projection");
+	lightLoc = glGetUniformLocation(ProgramID, "light");
+	colorLoc = glGetUniformLocation(ProgramID, "color");
+	ambLightLoc = glGetUniformLocation(ProgramID, "ambLight");
+	cameraPositionLoc = glGetUniformLocation(ProgramID, "cameraPosition");
+	textureBoolLoc = glGetUniformLocation(ProgramID, "textureBool");
+	glUseProgram(ProgramID);
 }
 
 GLuint Shader::getProgramID() {
 	return ProgramID;
+}
+
+GLuint Shader::getModelLoc() {
+	return modelLoc;
+}
+
+GLuint Shader::getViewLoc() {
+	return viewLoc;
+}
+
+GLuint Shader::getProjLoc() {
+	return projLoc;
+}
+
+GLuint Shader::getLightLoc() {
+	return lightLoc;
+}
+
+GLuint Shader::getColorLoc() {
+	return colorLoc;
+}
+
+GLuint Shader::getAmbLightLoc() {
+	return ambLightLoc;
+}
+
+GLuint Shader::getCameraPositionLoc() {
+	return cameraPositionLoc;
+}
+
+GLuint Shader::getTextureBoolLoc() {
+	return textureBoolLoc;
 }
