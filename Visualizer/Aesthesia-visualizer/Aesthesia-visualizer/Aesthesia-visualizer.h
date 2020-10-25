@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Object.h"
 #include "Cube.h"
+#include "Mesh.h"
 
 const bool debug = false;
 const bool fps_count = false;
@@ -26,20 +27,14 @@ glm::vec3 lightModelPos = glm::vec3(10.0f, 15.0f, 10.0f);
 glm::vec3 lightWorldPos;
 glm::mat4 projection;
 glm::mat4 view;
-aiColor3D materialColor = aiColor3D(0.0f, 0.0f, 0.0f);
-std::vector<glm::vec3> modelColor;
 glm::vec3 cameraPosition;
 glm::mat4 worldTransform;
 glm::mat4 meshTransform;
-std::vector<std::vector<glm::vec3>> meshesVertices;
-std::vector<std::vector<GLuint>> meshesIndices;
-std::vector<std::vector<glm::vec3>> meshesNormals;
-std::vector<std::vector<glm::vec2>> meshesTexCoords;
-std::vector<GLuint> materialIndices;
 std::vector<GLuint> textures;
 std::vector<int> texWidths;
 std::vector<int> texHeights;
-
+Mesh* mesh;
+Shader* shader;
 
 GLfloat lastX = WIN_WIDTH / 2.0f;
 GLfloat lastY = WIN_WIDTH / 2.0f;

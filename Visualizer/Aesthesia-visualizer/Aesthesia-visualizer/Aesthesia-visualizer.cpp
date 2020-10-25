@@ -8,130 +8,16 @@ int main()
 	}
 
 	// Shader setup
-	Shader shader = Shader("vertex.shader", "fragment.shader");
+	shader = new Shader("vertex.shader", "fragment.shader");
 
-	// Importing scene
-	// TODO: Abstract out to a mesh class
-	Assimp::Importer importer;
-
-	// And have it read the given file with some example postprocessing
-	// Usually - if speed is not the most important aspect for you - you'll
-	// probably to request more postprocessing than we do in this example.
-	// TODO: prompt user with an open dialog box to get obj file path
-	std::string assetDir = "C:\\Users\\David\\Documents\\Perso\\stockpile\\2020-07-29\\";
-	std::string objFile = "ramen.obj";
-	const aiScene* scene = importer.ReadFile(assetDir + objFile,
-		aiProcessPreset_TargetRealtime_MaxQuality
-	);
-	// If the import failed, report it
-	if (!scene) {
-		std::cout << "file not found";
-	}
-
-	// Extract vertex coordinates
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		std::vector<glm::vec3> meshVetices;
-		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-			meshVetices.push_back(glm::vec3(
-				scene->mMeshes[i]->mVertices[j].x,
-				scene->mMeshes[i]->mVertices[j].y,
-				scene->mMeshes[i]->mVertices[j].z));
-		}
-		meshesVertices.push_back(meshVetices);
-	}
-
-	// Extract indices
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		std::vector<GLuint> meshIndices;
-		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; j++) {
-			meshIndices.push_back(scene->mMeshes[i]->mFaces[j].mIndices[0]);
-			meshIndices.push_back(scene->mMeshes[i]->mFaces[j].mIndices[1]);
-			meshIndices.push_back(scene->mMeshes[i]->mFaces[j].mIndices[2]);
-		}
-		meshesIndices.push_back(meshIndices);
-	}
-
-	// Extract normals
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		std::vector<glm::vec3> meshNormals;
-		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-			meshNormals.push_back(glm::vec3(
-				scene->mMeshes[i]->mNormals[j].x,
-				scene->mMeshes[i]->mNormals[j].y,
-				scene->mMeshes[i]->mNormals[j].z));
-		}
-		meshesNormals.push_back(meshNormals);
-	}
-
-	// Extract texture coordinates
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		std::vector<glm::vec2> meshTexCoords;
-		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-			meshTexCoords.push_back(glm::vec2(
-				scene->mMeshes[i]->mTextureCoords[0][j].x,
-				scene->mMeshes[i]->mTextureCoords[0][j].y)
-			);
-		}
-		meshesTexCoords.push_back(meshTexCoords);
-	}
-
-	// Extract material indices per mesh
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		materialIndices.push_back(scene->mMeshes[i]->mMaterialIndex);
-		scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_DIFFUSE, materialColor);
-		modelColor.push_back(glm::vec3(materialColor.r, materialColor.g, materialColor.b));
-	}
-
-	// Mesh VBO and VAO binding
-	std::vector<GLuint> VAO, VBO, normVBO, texVBO, EBO;
-
-	for(int i = 0; i < scene->mNumMeshes; i++){
-		VBO.push_back(*new GLuint);
-		VAO.push_back(*new GLuint);
-		normVBO.push_back(*new GLuint);
-		texVBO.push_back(*new GLuint);
-		EBO.push_back(*new GLuint);
-
-		glGenVertexArrays(1, &VAO[i]);
-		glBindVertexArray(VAO[i]);
-
-		glGenBuffers(1, &VBO[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
-		glBufferData(GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(glm::vec3),
-			&meshesVertices[i][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(0);
-
-		glGenBuffers(1, &normVBO[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, normVBO[i]);
-		glBufferData(GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(glm::vec3),
-			&meshesNormals[i][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(1);
-
-		glGenBuffers(1, &texVBO[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, texVBO[i]);
-		glBufferData(GL_ARRAY_BUFFER, scene->mMeshes[i]->mNumVertices * sizeof(glm::vec2),
-			&meshesTexCoords[i][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(2);
-
-		glGenBuffers(1, &EBO[i]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[i]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, scene->mMeshes[i]->mNumFaces * 3 * sizeof(GLuint),
-			&meshesIndices[i][0], GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(3, 1, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(3);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	}
+	// Load mesh
+	mesh = new Mesh();
 
 	// Extract texture file paths
 	// TODO: Abstract out to a material class
-	for (int i = 0; i < scene->mNumMaterials; i++) {
+	for (int i = 0; i < mesh->getScene()->mNumMaterials; i++) {
 		aiString* textureFilePath = new aiString;
-		scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFilePath);
+		mesh->getScene()->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFilePath);
 
 		textures.push_back(*new GLuint);
 		texWidths.push_back(*new int);
@@ -147,9 +33,9 @@ int main()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		aiString* textureFileName = new aiString;
-		scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFileName);
+		mesh->getScene()->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFileName);
 		std::string textureFileNameString = textureFileName->data;
-		std::string texturePath = assetDir + textureFileNameString;
+		std::string texturePath = "C:\\Users\\David\\Documents\\Perso\\stockpile\\2020-07-29\\" + textureFileNameString;
 
 		unsigned char *image = SOIL_load_image(texturePath.c_str(), &texWidths[i], &texHeights[i], 0, SOIL_LOAD_RGBA);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidths[i], texHeights[i], 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
@@ -158,28 +44,6 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-/*	GLuint texture;
-
-	int texWidth, texHeight;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	aiString* textureFileName = new aiString;
-	scene->mMaterials[1]->GetTexture(aiTextureType_DIFFUSE, 0, textureFileName);
-	std::string textureFileNameString = textureFileName->data;
-	std::string texturePath = assetDir + textureFileNameString;
-
-	unsigned char *image = SOIL_load_image(texturePath.c_str(), &texWidth, &texHeight, 0, SOIL_LOAD_RGBA);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(image);
-	glBindTexture(GL_TEXTURE_2D, 0);
-*/
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
 		
@@ -231,24 +95,24 @@ int main()
 
 		// Apply world transformation
 
-		glUniformMatrix4fv(shader.getViewLoc(), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(shader.getProjLoc(), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(shader.getCameraPositionLoc(), 1, glm::value_ptr(cameraPosition));
-		glUniform1f(shader.getTextureBoolLoc(), textureBool);
+		glUniformMatrix4fv(shader->getViewLoc(), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(shader->getProjLoc(), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform3fv(shader->getCameraPositionLoc(), 1, glm::value_ptr(cameraPosition));
+		glUniform1f(shader->getTextureBoolLoc(), textureBool);
 
-		glUniformMatrix4fv(shader.getModelLoc(), 1, GL_FALSE, glm::value_ptr(worldTransform));
-		glUniform3fv(shader.getLightLoc(), 1, glm::value_ptr(lightWorldPos));
-		glUniform1f(shader.getAmbLightLoc(), ambLight);
+		glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(worldTransform));
+		glUniform3fv(shader->getLightLoc(), 1, glm::value_ptr(lightWorldPos));
+		glUniform1f(shader->getAmbLightLoc(), ambLight);
 
 		// Bind vertex array and render scene
-		for (int i = 0; i < scene->mNumMeshes; i++) {
+		for (int i = 0; i < mesh->getScene()->mNumMeshes; i++) {
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, textures[i]);
-			glUniform1i(glGetUniformLocation(shader.getProgramID(), "meshTexture"), 0);
-			glBindVertexArray(VAO[i]);
+			glUniform1i(glGetUniformLocation(shader->getProgramID(), "meshTexture"), 0);
+			glBindVertexArray(mesh->getVAO()[i]);
 
-			glUniform3fv(shader.getColorLoc(), 1, glm::value_ptr(modelColor[i]));
+			glUniform3fv(shader->getColorLoc(), 1, glm::value_ptr(mesh->getModelColor()[i]));
 
 			// Apply transformations to the mesh
 			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -257,21 +121,21 @@ int main()
 				5.0f + inData[i] * 0.075, 
 				5.0f + inData[i] * 0.075));
 			meshTransform = worldTransform * meshTransform;
-			glUniformMatrix4fv(shader.getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
+			glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
 
-			glDrawElements(GL_TRIANGLES, scene->mMeshes[i]->mNumFaces * 3, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, mesh->getScene()->mMeshes[i]->mNumFaces * 3, GL_UNSIGNED_INT, nullptr);
 			glBindVertexArray(0);
 		}
 		glfwSwapBuffers(window);
 	}
 
 	// Properly de-allocate all resources once they've outlived their purpose
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		glDeleteVertexArrays(1, &VAO[i]);
-		glDeleteBuffers(1, &VBO[i]);
-		glDeleteBuffers(1, &normVBO[i]);
-		glDeleteBuffers(1, &texVBO[i]);
-		glDeleteBuffers(1, &EBO[i]);
+	for (int i = 0; i < mesh->getScene()->mNumMeshes; i++) {
+		glDeleteVertexArrays(1, &(mesh->getVAO()[i]));
+		glDeleteBuffers(1, &(mesh->getVBO()[i]));
+		glDeleteBuffers(1, &(mesh->getNormVBO()[i]));
+		glDeleteBuffers(1, &(mesh->getTexVBO()[i]));
+		glDeleteBuffers(1, &(mesh->getEBO()[i]));
 	}
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
