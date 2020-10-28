@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "Object.h"
 #include "Mesh.h"
 
 Mesh::Mesh()

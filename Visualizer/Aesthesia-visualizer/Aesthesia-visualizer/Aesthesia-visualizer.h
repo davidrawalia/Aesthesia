@@ -5,6 +5,7 @@
 #include "Object.h"
 #include "Cube.h"
 #include "Mesh.h"
+#include "Material.h"
 
 const bool debug = false;
 const bool fps_count = false;
@@ -30,11 +31,9 @@ glm::mat4 view;
 glm::vec3 cameraPosition;
 glm::mat4 worldTransform;
 glm::mat4 meshTransform;
-std::vector<GLuint> textures;
-std::vector<int> texWidths;
-std::vector<int> texHeights;
 Mesh* mesh;
 Shader* shader;
+Material* material;
 
 GLfloat lastX = WIN_WIDTH / 2.0f;
 GLfloat lastY = WIN_WIDTH / 2.0f;
