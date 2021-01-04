@@ -11,11 +11,12 @@ public:
 	std::vector<GLuint> getTexVBO();
 	std::vector<GLuint> getEBO();
 	std::vector<glm::vec3> getModelColor();
+	std::string getFileDir();
 private:
-	// TODO: prompt user with an open dialog box to get obj file path
 	const aiScene* scene;
-	std::string assetDir = "C:\\Users\\David\\Documents\\Perso\\stockpile\\2020-07-29\\";
-	std::string objFile = "ramen.obj";
+	std::wstring wFilePath;
+	std::string filePath;
+	std::string fileDir;
 	Assimp::Importer importer;
 	std::vector<std::vector<glm::vec3>> meshesVertices;
 	std::vector<std::vector<GLuint>> meshesIndices;

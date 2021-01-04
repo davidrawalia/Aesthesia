@@ -99,7 +99,7 @@
       <AdditionalIncludeDirectories>C:\libs\assimp-5.0.1\include;C:\libs\soil2\src;C:\libs\glm;C:\libs\glfw-3.2.1.bin.WIN32\include;C:\libs\glew-2.1.0\include;C:\libs\boost_1_71_0;$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\libs\assimp-5.0.1\lib\Debug;C:\libs\boost_1_71_0\stage\lib;C:\libs\glew-2.1.0\lib\Release\Win32;C:\libs\glfw-3.3.bin.WIN32\lib-vc2017;C:\libs\soil2\lib\windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc141-mtd.lib;opengl32.lib;glew32.lib;glfw3.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>

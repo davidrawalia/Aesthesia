@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+#include <shobjidl.h> 
 #include "targetver.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
