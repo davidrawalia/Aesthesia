@@ -18,14 +18,14 @@ out vec3 outNormal;
 out vec3 outColor;
 out vec3 outLight;
 out float outAmbLight;
-out vec2 outTex;
+out vec2 outTexCoord;
 out float textureBoolOut;
 out vec4 FragPosLightSpace;
 
 void main()
 {
 	gl_Position = projection * view * model * vec4(position.x, position.y, position.z, 1.0);
-	outTex = vec2(texCoord.x, 1 - texCoord.y);
+	outTexCoord = vec2(texCoord.x, 1 - texCoord.y);
 
 	outNormal = vec3(model * vec4(normal, 0.0));
 	fragPosition = vec3(model * vec4(position, 1.0));

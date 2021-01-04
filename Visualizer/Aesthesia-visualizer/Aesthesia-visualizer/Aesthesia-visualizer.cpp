@@ -7,153 +7,20 @@ int main()
 		return -1;
 	}
 
-	//	Shader setup
-	Shader shader = Shader("vertex.shader", "fragment.shader");
-	GLint modelLoc = glGetUniformLocation(shader.getProgramID(), "model");
-	GLint viewLoc = glGetUniformLocation(shader.getProgramID(), "view");
-	GLint projLoc = glGetUniformLocation(shader.getProgramID(),
-		"projection");
-	GLint lightLoc = glGetUniformLocation(shader.getProgramID(), "light");
-	GLint colorLoc = glGetUniformLocation(shader.getProgramID(), "color");
-	GLint ambLightLoc = glGetUniformLocation(shader.getProgramID(),
-		"ambLight");
-	GLint cameraPositionLoc = glGetUniformLocation(shader.getProgramID(),
-		"cameraPosition");
-	GLint textureBoolLoc = glGetUniformLocation(shader.getProgramID(),
-		"textureBool");
+	// Shader setup
+	shader = new Shader("vertex.shader", "fragment.shader");
 
-	// Importing scene
-	Assimp::Importer importer;
-
-	// And have it read the given file with some example postprocessing
-	// Usually - if speed is not the most important aspect for you - you'll
-	// probably to request more postprocessing than we do in this example.
-	const aiScene* scene = importer.ReadFile("C:\\Users\\David\\Documents\\Perso\\Wally\\logo 3d\\wally logo_001.obj",
-		aiProcess_Triangulate |
-		aiProcess_ValidateDataStructure |
-		aiProcess_GenNormals
-	);
-	// If the import failed, report it
-	if (!scene) {
-		std::cout << "file not found";
-	}
-
-	// Extract vertex coordinates
-	std::vector<glm::vec3> meshesVertices;
-	int numVertices = 0;
-
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-			meshesVertices.push_back(glm::vec3(
-				scene->mMeshes[i]->mVertices[j].x,
-				scene->mMeshes[i]->mVertices[j].y,
-				scene->mMeshes[i]->mVertices[j].z));
-			numVertices++;
-			std:: cout << "v" << j << ": " << 
-				scene->mMeshes[i]->mVertices[j].x << ", " <<
-				scene->mMeshes[i]->mVertices[j].y << ", " <<
-				scene->mMeshes[i]->mVertices[j].z << "\n ";
-		}
-	}
-
-	std::cout << "numVertices: "  << numVertices << "\n";
-	std::cout << "calculated numVertices: " << scene->mMeshes[0]->mNumVertices + scene->mMeshes[1]->mNumVertices << "\n";
-
-	// Extract indices (assimp doesn't support vertex joins so indices are in order)
-	std::vector<GLuint> meshesIndices;
-	int numIndices = 0;
-
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		for (int j = 0; j < scene->mMeshes[i]->mNumFaces; j++) {
-			meshesIndices.push_back(numIndices);
-			numIndices++;
-			meshesIndices.push_back(numIndices);
-			numIndices++;
-			meshesIndices.push_back(numIndices);
-			numIndices++;
-		}
-	}
-
-	std::cout << "numIndices: " << numIndices << "\n";
-	std::cout << "calculated numIndices: " << scene->mMeshes[0]->mNumFaces * 3 + scene->mMeshes[1]->mNumFaces * 3 << "\n";
-
-
-	// Extract normals
-	std::vector<glm::vec3> meshesNormals;
-	int numNormals = 0;
-
-	for (int i = 0; i < scene->mNumMeshes; i++) {
-		for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-			meshesNormals.push_back(glm::vec3(
-				scene->mMeshes[i]->mNormals[j].x,
-				scene->mMeshes[i]->mNormals[j].y,
-				scene->mMeshes[i]->mNormals[j].z));
-			numNormals++;
-		}
-	}
-
-	std::cout << "numNormals: " << numNormals << "\n";
-	std::cout << "canumNormals: " << scene->mMeshes[0]->mNumVertices + scene->mMeshes[1]->mNumVertices << "\n";
-
-	// Extract texture coordinates
-
-	std::vector<glm::vec2> meshesTexCoords;
-
-	/*
-	if (scene->HasTextures){
-		for (int i = 0; i < scene->mNumMeshes; i++) {
-			for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
-				meshesTexCoords.push_back(glm::vec2(
-					scene->mMeshes[i]->mTextureCoords[0]->x,
-					scene->mMeshes[i]->mTextureCoords[0]->y)
-				);
-			}
-			meshesTexCoords.push_back(meshTexCoords);
-		}
-	}
-	*/
-
-	//	Mesh VBO and VAO binding
-	GLuint VBO, VAO, normVBO, texVBO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(glm::vec3),
-		&meshesVertices[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(0);
-
-	glGenBuffers(1, &normVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, normVBO);
-	glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(glm::vec3),
-		&meshesNormals[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
-
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(GLuint),
-		&meshesIndices.front(), GL_DYNAMIC_DRAW);
+	// Load mesh
+	mesh = new Mesh();
 	
-	/*
-	glGenBuffers(1, &texVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, texVBO);
-	glBufferData(GL_ARRAY_BUFFER, texCoord.size() * sizeof(glm::vec2),
-		&texCoord[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(2);
-	*/
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
+	// Extract texture file paths
+	material = new Material(mesh);
 
 	//	******** MAIN LOOP ********
 	while (!glfwWindowShouldClose(window)){
 		
 		// Read incoming data from shared memory
+		// TODO: abstract this to it's own object
 		using namespace boost::interprocess;
 		try {
 			managed_shared_memory segment(open_only, "shared_memory");
@@ -166,7 +33,8 @@ int main()
 			std::cout << e.what() << '\n';
 		}
 
-		//	FPS counter
+		// FPS counter
+		// TODO: abstract this to it's own object
 		GLdouble currentTime = glfwGetTime();
 		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
@@ -179,67 +47,68 @@ int main()
 			lastTime += 1.0;
 		}
 
-		//	Event polling
+		// Event polling
 		glfwPollEvents();
 		doMovement();
 
-		glClearColor(*redbk, *greenbk, *bluebk, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glm::vec3 light = glm::vec3(5.0f, 20.0f, 5.0f);	// *** LIGHT COORDS ***
-
-		glm::mat4 projection = glm::perspective(camera.GetZoom(), 
+		// Update transformation matrices 
+		projection = glm::perspective(camera.GetZoom(), 
 												(GLfloat)width/(GLfloat)height, 
 											    0.1f, 1000.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::vec3 color;
-		glm::vec3 cameraPosition = camera.getPosition();
-		glm::mat4 worldTransform;
-
+		view = camera.GetViewMatrix();
+		cameraPosition = camera.getPosition();
+		worldTransform = glm::mat4(1.0f);
 		worldTransform = glm::rotate(worldTransform, -worldXRotation, right);
 		worldTransform = glm::rotate(worldTransform, worldYRotation, up);
-		light = worldTransform * glm::vec4(light, 1.0f);
+		lightWorldPos = worldTransform * glm::vec4(lightModelPos, 1.0f);
 
-		// Render scene
-		glViewport(0, 0, width, height);
+		// Clear buffers 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(shader.getProgramID());
 
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(cameraPositionLoc, 1, glm::value_ptr(cameraPosition));
-		glUniform1f(textureBoolLoc, textureBool);
+		// Apply world transformation
 
-		glUniform3fv(lightLoc, 1, glm::value_ptr(light));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, 
-						   glm::value_ptr(worldTransform));
+		glUniformMatrix4fv(shader->getViewLoc(), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(shader->getProjLoc(), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform3fv(shader->getCameraPositionLoc(), 1, glm::value_ptr(cameraPosition));
+		glUniform1f(shader->getTextureBoolLoc(), textureBool);
 
-		// Drawing cube
-		color = glm::vec3(1.0f, 1.0f, 1.0f);
-		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
-		ambLight = 0.1f;
-		glUniform1f(ambLightLoc, ambLight);
-		glBindVertexArray(VAO);
-		glPolygonMode(GL_FRONT_AND_BACK, renderMode);
+		glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(worldTransform));
+		glUniform3fv(shader->getLightLoc(), 1, glm::value_ptr(lightWorldPos));
+		glUniform1f(shader->getAmbLightLoc(), ambLight);
 
-		glm::mat4 cubeTransform = glm::translate(glm::mat4(), 
-												 glm::vec3(0.0f, 0.0f, 0.0f));
-		cubeTransform = glm::scale(cubeTransform, glm::vec3(5.0f, 5.0f, 5.0f));		
-//		cubeTransform = glm::scale(cubeTransform, glm::vec3(inData[0]*0.1, 
-//								   5, 5.0f));
-		cubeTransform = worldTransform * cubeTransform;
+		// Bind vertex array and render scene
+		for (int i = 0; i < mesh->getScene()->mNumMeshes; i++) {
 
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, 
-						   glm::value_ptr(cubeTransform));
-		glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, nullptr);
-			
-		glBindVertexArray(0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, material->getTexture(i));
+			glUniform1i(glGetUniformLocation(shader->getProgramID(), "meshTexture"), 0);
+			glBindVertexArray(mesh->getVAO()[i]);
+
+			glUniform3fv(shader->getColorLoc(), 1, glm::value_ptr(mesh->getModelColor()[i]));
+
+			// Apply transformations to the mesh
+			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
+			meshTransform = glm::scale(meshTransform, glm::vec3(
+				5.0f + inData[i]  *0.075, 
+				5.0f + inData[i] * 0.075, 
+				5.0f + inData[i] * 0.075));
+			meshTransform = worldTransform * meshTransform;
+			glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
+
+			glDrawElements(GL_TRIANGLES, mesh->getScene()->mMeshes[i]->mNumFaces * 3, GL_UNSIGNED_INT, nullptr);
+			glBindVertexArray(0);
+		}
 		glfwSwapBuffers(window);
 	}
 
 	// Properly de-allocate all resources once they've outlived their purpose
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	for (int i = 0; i < mesh->getScene()->mNumMeshes; i++) {
+		glDeleteVertexArrays(1, &(mesh->getVAO()[i]));
+		glDeleteBuffers(1, &(mesh->getVBO()[i]));
+		glDeleteBuffers(1, &(mesh->getNormVBO()[i]));
+		glDeleteBuffers(1, &(mesh->getTexVBO()[i]));
+		glDeleteBuffers(1, &(mesh->getEBO()[i]));
+	}
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
@@ -300,11 +169,18 @@ int init() {
 	// size of points when in point view mode
 	glPointSize(5.0);
 	// disable rendering of faces pointing away from camera
-//	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
+	// Define polygon rendering mode
+	glPolygonMode(GL_FRONT_AND_BACK, renderMode);
+	// Set background color to greenscreen green
+	glClearColor(*redbk, *greenbk, *bluebk, 1.0f);
+	// enable texture alpha blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void doMovement() {
-	const GLfloat velocity = 1;
+	const GLfloat velocity = 0.2;
 
 	if (keys[GLFW_KEY_UP])
 	{
@@ -322,6 +198,16 @@ void doMovement() {
 	if (keys[GLFW_KEY_RIGHT])
 	{
 		worldYRotation -= velocity * deltaTime;
+	}
+	if (keys[GLFW_KEY_KP_8])
+	{
+		GLfloat movement = velocity * deltaTime * 50;
+		camera.ProcessMouseMovement(movement, movement, 0);
+	}
+	if (keys[GLFW_KEY_KP_2])
+	{
+		GLfloat movement = velocity * deltaTime * -50;
+		camera.ProcessMouseMovement(movement, movement, 0);
 	}
 };
 

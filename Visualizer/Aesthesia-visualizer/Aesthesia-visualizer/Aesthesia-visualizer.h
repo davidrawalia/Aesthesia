@@ -4,15 +4,17 @@
 #include "Camera.h"
 #include "Object.h"
 #include "Cube.h"
+#include "Mesh.h"
+#include "Material.h"
 
 const bool debug = false;
 const bool fps_count = false;
 
-const GLuint WIN_WIDTH = 1000, WIN_HEIGHT = 1000;
+const GLuint WIN_WIDTH = 1920, WIN_HEIGHT = 1080;
 GLFWwindow* window;
-GLclampf* redbk = new GLclampf(0.5f);
-GLclampf* greenbk = new GLclampf(0.5f);
-GLclampf* bluebk = new GLclampf(0.5f);
+GLclampf* redbk = new GLclampf(0.0f);
+GLclampf* greenbk = new GLclampf(1.0f);
+GLclampf* bluebk = new GLclampf(0.0f);
 GLfloat worldYRotation = 0.0f;
 GLfloat worldXRotation = 0.0f;
 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -21,7 +23,17 @@ glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
 GLdouble lastTime = glfwGetTime();
 GLuint nbFrames = 0;
 Camera camera = Camera(0.0f, 30.0f, 0.0f, 0.0f, 1.0f, 0.0f, -90.0f, -89.0f);
-GLfloat ambLight;
+GLfloat ambLight = 0.1f;
+glm::vec3 lightModelPos = glm::vec3(10.0f, 15.0f, 10.0f);
+glm::vec3 lightWorldPos;
+glm::mat4 projection;
+glm::mat4 view;
+glm::vec3 cameraPosition;
+glm::mat4 worldTransform;
+glm::mat4 meshTransform;
+Mesh* mesh;
+Shader* shader;
+Material* material;
 
 GLfloat lastX = WIN_WIDTH / 2.0f;
 GLfloat lastY = WIN_WIDTH / 2.0f;
