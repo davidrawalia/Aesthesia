@@ -21,7 +21,7 @@ Material::Material(Mesh* mesh) {
 		aiString* textureFileName = new aiString;
 		mesh->getScene()->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, textureFileName);
 		std::string textureFileNameString = textureFileName->data;
-		std::string texturePath = "C:\\Users\\David\\Documents\\Perso\\stockpile\\2020-07-29\\" + textureFileNameString;
+		std::string texturePath = mesh->getFileDir() + textureFileNameString;
 
 		unsigned char *image = SOIL_load_image(texturePath.c_str(), &texWidths[i], &texHeights[i], 0, SOIL_LOAD_RGBA);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidths[i], texHeights[i], 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
