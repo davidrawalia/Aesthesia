@@ -1,4 +1,5 @@
 #version 330 core
+
 uniform vec3 cameraPosition;
 uniform sampler2D textureMap;
 uniform sampler2D shadowMap;
@@ -11,6 +12,9 @@ in float outAmbLight;
 in vec2 outTexCoord;
 in float textureBoolOut;
 in vec4 FragPosLightSpace;
+in float outReflectionCoefficient;
+in float outReflectionExponent;
+in float outSpecular;
 
 out vec4 color;
 
@@ -25,18 +29,19 @@ void main()
 	}
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 	vec3 specularColor = vec3(1.0f, 1.0f, 1.0f);
-	float specularStrength = 0.5;
-	float reflectionCoefficient = 0.9f;
+	float specularStrength = outSpecular;
+	float reflectionCoefficient = outReflectionCoefficient;
+	float reflectionExponent = outReflectionExponent;
 	vec3 amb_contribution = outAmbLight * lightColor;
 
 	vec3 norm = normalize(outNormal);
 	vec3 light_direction = normalize(outLight - fragPosition);
 	float degree = max(dot(norm, light_direction), 0.0f);
-	vec3 diffuse_contribution = degree * lightColor;
+	vec3 diffuse_contribution = degree * lightColor * 0.5f;
 
 	vec3 viewDir = normalize(cameraPosition - fragPosition);
 	vec3 reflectDir = reflect(-light_direction, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	float spec = pow(max(dot(viewDir, reflectDir), outReflectionCoefficient), reflectionExponent);
 	vec3 specular_contribution = specularStrength * spec * specularColor;
 
 	vec4 result_color = vec4(amb_contribution + (diffuse_contribution + specular_contribution), 1.0);

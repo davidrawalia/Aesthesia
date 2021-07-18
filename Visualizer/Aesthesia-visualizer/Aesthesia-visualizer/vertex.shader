@@ -12,6 +12,9 @@ uniform float ambLight;
 uniform vec3 color;
 uniform float textureBool;
 uniform mat4 lightSpaceMatrix;
+uniform float reflectionCoefficient;
+uniform float reflectionExponent;
+uniform float specular;
 
 out vec3 fragPosition;
 out vec3 outNormal;
@@ -21,6 +24,9 @@ out float outAmbLight;
 out vec2 outTexCoord;
 out float textureBoolOut;
 out vec4 FragPosLightSpace;
+out float outReflectionCoefficient;
+out float outReflectionExponent;
+out float outSpecular;
 
 void main()
 {
@@ -33,5 +39,8 @@ void main()
 	outAmbLight = ambLight;
 	outLight = light;
 	textureBoolOut = textureBool;
+	outReflectionCoefficient = reflectionCoefficient;
+	outReflectionExponent = reflectionExponent;
+	outSpecular = specular;
 	FragPosLightSpace = lightSpaceMatrix * vec4(fragPosition, 1.0);
 }

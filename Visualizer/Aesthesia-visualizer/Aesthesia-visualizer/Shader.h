@@ -10,6 +10,9 @@ public:
 	GLuint getAmbLightLoc();
 	GLuint getCameraPositionLoc();
 	GLuint getTextureBoolLoc();
+	GLuint getReflectionCoefficientLoc();
+	GLuint getReflectionExponentLoc();
+	GLuint getSpecularLoc();
 
 private:
 	GLuint ProgramID;
@@ -21,4 +24,7 @@ private:
 	GLint ambLightLoc;
 	GLint cameraPositionLoc;
 	GLint textureBoolLoc;
+	GLint reflectionCoefficientLoc;
+	GLint reflectionExponentLoc;
+	GLint specularLoc;
 };
