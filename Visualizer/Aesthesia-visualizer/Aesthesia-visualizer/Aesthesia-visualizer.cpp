@@ -206,15 +206,53 @@ void doMovement() {
 	{
 		worldYRotation -= velocity * deltaTime;
 	}
+	if (keys[GLFW_KEY_W])
+	{
+		camera.ProcessKeyboard(FORWARD, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_S])
+	{
+		camera.ProcessKeyboard(BACKWARD, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_A])
+	{
+		camera.ProcessKeyboard(LEFT, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_D])
+	{
+		camera.ProcessKeyboard(RIGHT, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_KP_9])
+	{
+		camera.ProcessKeyboard(TOP, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_KP_3])
+	{
+		camera.ProcessKeyboard(BOTTOM, velocity * deltaTime);
+	}
 	if (keys[GLFW_KEY_KP_8])
 	{
-		GLfloat movement = velocity * deltaTime * 50;
-		camera.ProcessMouseMovement(movement, movement, 0);
+		camera.ProcessKeyboard(LOOKUP, velocity * deltaTime);
 	}
 	if (keys[GLFW_KEY_KP_2])
 	{
-		GLfloat movement = velocity * deltaTime * -50;
-		camera.ProcessMouseMovement(movement, movement, 0);
+		camera.ProcessKeyboard(LOOKDOWN, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_KP_4])
+	{
+		camera.ProcessKeyboard(LOOKLEFT, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_KP_6])
+	{
+		camera.ProcessKeyboard(LOOKRIGHT, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_KP_0])
+	{
+		camera.ProcessKeyboard(YAWLEFT, velocity * deltaTime);
+	}
+	if (keys[GLFW_KEY_KP_DECIMAL])
+	{
+		camera.ProcessKeyboard(YAWRIGHT, velocity * deltaTime);
 	}
 };
 
