@@ -96,12 +96,12 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\libs\assimp-5.0.1\include;C:\libs\soil2\src;C:\libs\glm;C:\libs\glfw-3.2.1.bin.WIN32\include;C:\libs\glew-2.1.0\include;C:\libs\boost_1_71_0;$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\libs\assimp-5.0.1\include;D:\libs\soil2\src;D:\libs\glm;D:\libs\glfw-3.2.1.bin.WIN32\include;D:\libs\glew-2.1.0\include;D:\libs\boost_1_71_0;$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\libs\assimp-5.0.1\lib\Debug;C:\libs\boost_1_71_0\stage\lib;C:\libs\glew-2.1.0\lib\Release\Win32;C:\libs\glfw-3.3.bin.WIN32\lib-vc2017;C:\libs\soil2\lib\windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\libs\assimp-5.0.1\lib\Debug;D:\libs\boost_1_71_0\stage\lib;D:\libs\glew-2.1.0\lib\Release\Win32;D:\libs\glfw-3.3.bin.WIN32\lib-vc2017;D:\libs\soil2\lib\windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc141-mtd.lib;opengl32.lib;glew32.lib;glfw3.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -132,15 +132,15 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\libs\assimp-5.0.1;C:\libs\boost_1_71_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\libs\assimp-5.0.1\include;D:\libs\soil2\src;D:\libs\glm;D:\libs\glfw-3.2.1.bin.WIN32\include;D:\libs\glew-2.1.0\include;D:\libs\boost_1_71_0;$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\libs\assimp-5.0.1\lib\Release;C:\libs\boost_1_71_0\stage\lib;C:\libs\soil2\lib\windows;C:\libs\glew-2.1.0\lib\Release\Win32;C:\libs\glfw-3.3.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil2-debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\libs\assimp-5.0.1\lib\Release;D:\libs\boost_1_71_0\stage\lib;D:\libs\soil2\lib\windows;D:\libs\glew-2.1.0\lib\Release\Win32;D:\libs\glfw-3.3.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil2-debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;assimp-vc141-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -194,9 +194,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.shader" />
+    <None Include="fragmentFlat.shader" />
     <None Include="sfragment.shader" />
     <None Include="svertex.shader" />
     <None Include="vertex.shader" />
+    <None Include="vertexFlat.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
