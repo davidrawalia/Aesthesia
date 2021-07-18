@@ -44,7 +44,6 @@ bool mousePressed[3];
 int width = WIN_HEIGHT;
 int height = WIN_HEIGHT;
 GLenum renderMode = GL_FILL;
-GLfloat textureBool = 1.0;
 
 int inDataLenght;
 float inData[128];

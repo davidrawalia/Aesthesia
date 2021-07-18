@@ -77,7 +77,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 		glUniformMatrix4fv(shader->getViewLoc(), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(shader->getProjLoc(), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform3fv(shader->getCameraPositionLoc(), 1, glm::value_ptr(cameraPosition));
-		glUniform1f(shader->getTextureBoolLoc(), textureBool);
 
 		glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(worldTransform));
 		glUniform3fv(shader->getLightLoc(), 1, glm::value_ptr(lightWorldPos));
@@ -86,11 +85,17 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 		// Bind vertex array and render scene
 		for (int i = 0; i < mesh->getScene()->mNumMeshes; i++) {
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, material->getTexture(i));
+			if (material->hasTexture(i)) {
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, material->getTexture(i));
+				glUniform1f(shader->getTextureBoolLoc(), 1);
+			}
+			else {
+				glUniform1f(shader->getTextureBoolLoc(), 0);
+			}
+
 			glUniform1i(glGetUniformLocation(shader->getProgramID(), "meshTexture"), 0);
 			glBindVertexArray(mesh->getVAO()[i]);
-
 			glUniform3fv(shader->getColorLoc(), 1, glm::value_ptr(mesh->getModelColor()[i]));
 
 			// Apply transformations to the mesh
@@ -320,12 +325,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action,
 			camera.resetCamera();
 			worldXRotation = 0;
 			worldYRotation = 0;
-			break;
-		case GLFW_KEY_X:
-			if (textureBool == 1.0)
-				textureBool = 0.0;
-			else
-				textureBool = 1.0;
 			break;
 		case GLFW_KEY_TAB:
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

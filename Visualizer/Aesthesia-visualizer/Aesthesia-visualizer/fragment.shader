@@ -16,7 +16,13 @@ out vec4 color;
 
 void main()
 {
-	vec4 meshColour = texture(textureMap, outTexCoord);
+	vec4 meshColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	if (textureBoolOut > 0) {
+		meshColour = texture(textureMap, outTexCoord);
+	}
+	else {
+		meshColour = vec4(outColor, 1.0f);
+	}
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 	vec3 specularColor = vec3(1.0f, 1.0f, 1.0f);
 	float specularStrength = 0.5;
