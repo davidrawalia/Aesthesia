@@ -90,5 +90,11 @@
     <None Include="vertex.shader">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="vertexFlat.shader">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="fragmentFlat.shader">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
