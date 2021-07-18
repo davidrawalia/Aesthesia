@@ -40,6 +40,45 @@ void Camera::ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime) {
 	if (RIGHT == direction) {
 		this->position = glm::rotate(position, velocity, glm::vec3(0.0, -1.0, 0.0));
 	}
+	if (RIGHT == direction) {
+		this->position += this->right * velocity;
+	}
+	if (TOP == direction) {
+		this->position += this->up * velocity;
+	}
+	if (BOTTOM == direction) {
+		this->position -= this->up * velocity;
+	}
+	if (LOOKUP == direction) {
+		this->front = glm::rotate(front, velocity, this->right);
+		this->up = glm::rotate(up, velocity, this->right);
+		this->right = glm::rotate(right, velocity, this->right);
+	}
+	if (LOOKDOWN == direction) {
+		this->front = glm::rotate(front, -velocity, this->right);
+		this->up = glm::rotate(up, -velocity, this->right);
+		this->right = glm::rotate(right, -velocity, this->right);
+	}
+	if (LOOKLEFT == direction) {
+		this->front = glm::rotate(front, velocity, this->up);
+		this->up = glm::rotate(up, velocity, this->up);
+		this->right = glm::rotate(right, velocity, this->up);
+	}
+	if (LOOKRIGHT == direction) {
+		this->front = glm::rotate(front, -velocity, this->up);
+		this->up = glm::rotate(up, -velocity, this->up);
+		this->right = glm::rotate(right, -velocity, this->up);
+	}
+	if (YAWLEFT == direction) {
+		this->front = glm::rotate(front, velocity, this->front);
+		this->up = glm::rotate(up, velocity, this->front);
+		this->right = glm::rotate(right, velocity, this->front);
+	}
+	if (YAWRIGHT == direction) {
+		this->front = glm::rotate(front, -velocity, this->front);
+		this->up = glm::rotate(up, -velocity, this->front);
+		this->right = glm::rotate(right, -velocity, this->front);
+	}
 }
 
 void Camera::ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLint mouseButtonPressed) {

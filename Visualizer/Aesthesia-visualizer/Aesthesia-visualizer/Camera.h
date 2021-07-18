@@ -3,7 +3,15 @@ enum Camera_Movement
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	TOP,
+	BOTTOM,
+	LOOKUP,
+	LOOKDOWN,
+	LOOKLEFT,
+	LOOKRIGHT,
+	YAWLEFT,
+	YAWRIGHT
 };
 
 const GLfloat YAW = -90.f;
