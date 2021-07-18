@@ -12,6 +12,9 @@ public:
 	std::vector<GLuint> getEBO();
 	std::vector<glm::vec3> getModelColor();
 	std::string getFileDir();
+	float getReflectionCoefficient(int i);
+	float getReflectionExponent(int i);
+	float getSpecular(int i);
 private:
 	const aiScene* scene;
 	std::wstring wFilePath;
@@ -26,4 +29,10 @@ private:
 	aiColor3D materialColor = aiColor3D(0.0f, 0.0f, 0.0f);
 	std::vector<glm::vec3> modelColor;
 	std::vector<GLuint> VAO, VBO, normVBO, texVBO, EBO;
+	aiColor3D materialReflectionCoefficient = aiColor3D(0.0f, 0.0f, 0.0f);
+	float materialReflectionExponent = 0.0f;
+	aiColor3D materialSpecular = aiColor3D(0.0f, 0.0f, 0.0f);
+	std::vector<float> reflectionCoefficients;
+	std::vector<float> reflectionExponents;
+	std::vector<float> speculars;
 };

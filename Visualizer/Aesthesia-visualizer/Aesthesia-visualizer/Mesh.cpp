@@ -108,6 +108,12 @@ Mesh::Mesh()
 		materialIndices.push_back(scene->mMeshes[i]->mMaterialIndex);
 		scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_DIFFUSE, materialColor);
 		modelColor.push_back(glm::vec3(materialColor.r, materialColor.g, materialColor.b));
+		scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_AMBIENT, materialReflectionCoefficient);
+		reflectionCoefficients.push_back(materialReflectionCoefficient.r);
+		scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_REFRACTI, materialReflectionExponent);
+		reflectionExponents.push_back(materialReflectionExponent);
+		scene->mMaterials[materialIndices[i]]->Get(AI_MATKEY_COLOR_SPECULAR, materialSpecular);
+		speculars.push_back(materialSpecular.r);
 	}
 
 	// Mesh VBO and VAO binding
@@ -192,4 +198,19 @@ std::vector<glm::vec3> Mesh::getModelColor()
 std::string Mesh::getFileDir()
 {
 	return fileDir;
+}
+
+float Mesh::getReflectionCoefficient(int i)
+{
+	return reflectionCoefficients[i];
+}
+
+float Mesh::getReflectionExponent(int i)
+{
+	return reflectionExponents[i];
+}
+
+float Mesh::getSpecular(int i)
+{
+	return speculars[i];
 }

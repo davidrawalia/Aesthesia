@@ -97,13 +97,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 			glUniform1i(glGetUniformLocation(shader->getProgramID(), "meshTexture"), 0);
 			glBindVertexArray(mesh->getVAO()[i]);
 			glUniform3fv(shader->getColorLoc(), 1, glm::value_ptr(mesh->getModelColor()[i]));
+			glUniform1f(shader->getReflectionCoefficientLoc(), mesh->getReflectionCoefficient(i));
+			glUniform1f(shader->getReflectionExponentLoc(), mesh->getReflectionExponent(i));
+			glUniform1f(shader->getSpecularLoc(), mesh->getSpecular(i));
 
 			// Apply transformations to the mesh
 			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
 			meshTransform = glm::scale(meshTransform, glm::vec3(
-				5.0f + inData[i]  *0.075, 
-				5.0f + inData[i] * 0.075, 
-				5.0f + inData[i] * 0.075));
+				1.0f + inData[i]  *0.01, 
+				1.0f + inData[i] * 0.01, 
+				1.0f + inData[i] * 0.01));
 			meshTransform = worldTransform * meshTransform;
 			glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
 

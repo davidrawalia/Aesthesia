@@ -104,6 +104,9 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 	ambLightLoc = glGetUniformLocation(ProgramID, "ambLight");
 	cameraPositionLoc = glGetUniformLocation(ProgramID, "cameraPosition");
 	textureBoolLoc = glGetUniformLocation(ProgramID, "textureBool");
+	reflectionCoefficientLoc = glGetUniformLocation(ProgramID, "reflectionCoefficient");
+	reflectionExponentLoc = glGetUniformLocation(ProgramID, "reflectionExponent");
+	specularLoc = glGetUniformLocation(ProgramID, "specular");
 	glUseProgram(ProgramID);
 }
 
@@ -141,4 +144,19 @@ GLuint Shader::getCameraPositionLoc() {
 
 GLuint Shader::getTextureBoolLoc() {
 	return textureBoolLoc;
+}
+
+GLuint Shader::getReflectionCoefficientLoc()
+{
+	return reflectionCoefficientLoc;
+}
+
+GLuint Shader::getReflectionExponentLoc()
+{
+	return reflectionExponentLoc;
+}
+
+GLuint Shader::getSpecularLoc()
+{
+	return specularLoc;
 }
