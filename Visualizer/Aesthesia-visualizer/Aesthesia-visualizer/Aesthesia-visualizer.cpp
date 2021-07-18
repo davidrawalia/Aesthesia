@@ -103,10 +103,28 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 
 			// Apply transformations to the mesh
 			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-			meshTransform = glm::scale(meshTransform, glm::vec3(
-				1.0f + inData[i]  *0.01, 
-				1.0f + inData[i] * 0.01, 
-				1.0f + inData[i] * 0.01));
+			// Apply dynamic transforms
+			if (i == 0) {
+				meshTransform = glm::scale(meshTransform, glm::vec3(
+					1 + inData[i] * 0.01,
+					1 + inData[i] * 0.01,
+					1 + inData[i] * 0.01));
+				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, 1.0f, 0.0f));
+			}
+			else if (i == 1) {
+				meshTransform = glm::translate(meshTransform, glm::vec3(
+					0,
+					inData[i] * 0.01,
+					0
+				));
+				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, 1.0f, 0.0f));
+			}
+			else if (i == 2) {
+				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, -1.0f, 0.0f));
+			}
+			else if (i == 3) {
+				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, -1.0f, 0.0f));
+			};
 			meshTransform = worldTransform * meshTransform;
 			glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
 
@@ -196,6 +214,8 @@ int init() {
 
 void doMovement() {
 	const GLfloat velocity = 0.2;
+	camera.ProcessMouseMovement(sin(glfwGetTime() / 4) * 0.005, cos(glfwGetTime() / 8)* 0.005, 0);
+	worldXRotation -= sin(glfwGetTime() * 0.25)  * 0.0005;
 
 	if (keys[GLFW_KEY_UP])
 	{
