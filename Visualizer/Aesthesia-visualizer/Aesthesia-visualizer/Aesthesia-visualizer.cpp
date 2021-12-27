@@ -216,7 +216,6 @@ int init() {
 }
 
 void doMovement() {
-	const GLfloat velocity = 0.2;
 	camera.ProcessMouseMovement(sin(glfwGetTime() / 4) * 0.005, cos(glfwGetTime() / 8)* 0.005, 0);
 	worldXRotation -= sin(glfwGetTime() * 0.25)  * 0.0005;
 
@@ -295,8 +294,8 @@ void framebuffer_size_callback(GLFWwindow* window,
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
-	GLfloat xOffset = xPos - lastX;
-	GLfloat yOffset = lastY - yPos;
+	xOffset = xPos - lastX;
+	yOffset = lastY - yPos;
 	lastX = xPos;
 	lastY = yPos;
 
@@ -318,10 +317,6 @@ void scroll_callback(GLFWwindow* window, double xOffset, double yOffset) {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 			      int mode)
 {
-	const GLfloat scaleSpeed = 0.1;
-	const GLfloat positionSpeed = 1;
-	const GLfloat rotationSpeed = 0.0872665;
-
 	if (key >= 0 && key < 1024) {
 		if (action == GLFW_PRESS) {
 			keys[key] = true;
@@ -362,7 +357,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action,
 void mouse_button_callback(GLFWwindow* window, int button, int action, 
 						   int mods)
 {
-	GLdouble xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 	lastX = xpos;
 	lastY = ypos;

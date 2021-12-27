@@ -97,8 +97,7 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 
 	modelLoc = glGetUniformLocation(ProgramID, "model");
 	viewLoc = glGetUniformLocation(ProgramID, "view");
-	projLoc = glGetUniformLocation(ProgramID,
-		"projection");
+	projLoc = glGetUniformLocation(ProgramID, "projection");
 	lightLoc = glGetUniformLocation(ProgramID, "light");
 	colorLoc = glGetUniformLocation(ProgramID, "color");
 	ambLightLoc = glGetUniformLocation(ProgramID, "ambLight");
