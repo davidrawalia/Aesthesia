@@ -22,9 +22,9 @@ out vec2 outTexCoord;
 out float textureBoolOut;
 out vec4 FragPosLightSpace;
 
-void main()
-{
-	gl_Position = projection * view * model * vec4(position.x, position.y, position.z, 1.0);
+void main() {
+	gl_Position = projection * view * model * vec4(position.x, position.y, position.z, 
+												   1.0);
 	outTexCoord = vec2(texCoord.x, 1 - texCoord.y);
 
 	outNormal = vec3(model * vec4(normal, 0.0));

@@ -1,20 +1,12 @@
-// Original camera code by SonarSystems (this has been rewritten to fit the parameters of the assignement)
-// https://github.com/SonarSystems/Modern-OpenGL-Tutorials/tree/master/%5BGETTING%20STARTED%5D/%5B6%5D%20Camera
-
 #include "pch.h"
 #include "Camera.h"
 
-
-
-Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch) : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM) {
-	this->position = position;
-	this->worldUp = up;
-	this->yaw = yaw;
-	this->pitch = pitch;
-	this->updateCameraVectors();
-}
-
-Camera::Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch) : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM) {
+Camera::Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, 
+			   GLfloat upZ, GLfloat yaw, GLfloat pitch) {
+	this->front = glm::vec3(0.0f, 0.0f, -1.0f);
+	this->movementSpeed = SPEED;
+	this->mouseSensitivity = SENSITIVITY;
+	this->zoom = ZOOM;
 	this->position = glm::vec3(posX, posY, posZ);
 	this->worldUp = glm::vec3(upX, upY, upZ);
 	this->yaw = yaw;
@@ -81,34 +73,41 @@ void Camera::ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime) {
 	}
 }
 
-void Camera::ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLint mouseButtonPressed) {
-
+void Camera::ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, 
+								  GLint mouseButtonPressed) {
 	xOffset *= this->mouseSensitivity;
 	yOffset *= this->mouseSensitivity;
 
 	if (mouseButtonPressed == 0) {
 		this->position += this->front * yOffset;
 	}
+
 	if (mouseButtonPressed == 1) {
-		this->front = glm::rotate(front, glm::radians(yOffset), glm::vec3(1.0f, 0.0f, 0.0f));
+		this->front = glm::rotate(front, glm::radians(yOffset), 
+								  glm::vec3(1.0f, 0.0f, 0.0f));
 		this->up = glm::rotate(up, glm::radians(yOffset), glm::vec3(1.0f, 0.0f, 0.0f));
-		this->right = glm::rotate(right, glm::radians(yOffset), glm::vec3(1.0f, 0.0f, 0.0f));
-	}
-	if (mouseButtonPressed == 2) {
-		this->front = glm::rotate(front, glm::radians(xOffset), glm::vec3(0.0f, 0.0f, 1.0f));
-		this->up = glm::rotate(up, glm::radians(xOffset), glm::vec3(0.0f, 0.0f, 1.0f));
-		this->right = glm::rotate(right, glm::radians(xOffset), glm::vec3(0.0f, 0.0f, 1.0f));
+		this->right = glm::rotate(right, glm::radians(yOffset), 
+								  glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 
+	if (mouseButtonPressed == 2) {
+		this->front = glm::rotate(front, glm::radians(xOffset), 
+								  glm::vec3(0.0f, 0.0f, 1.0f));
+		this->up = glm::rotate(up, glm::radians(xOffset), glm::vec3(0.0f, 0.0f, 1.0f));
+		this->right = glm::rotate(right, glm::radians(xOffset), 
+							      glm::vec3(0.0f, 0.0f, 1.0f));
+	}
 }
 
 void Camera::ProcessMouseScroll(GLfloat yOffset) {
 	if (this->zoom >= 1.0f && this->zoom <= 45.0f) {
 		this->zoom -= yOffset / 45.0f;
 	}
+
 	if (this->zoom <= 1.0f) {
 		this->zoom = 1.0f;
 	}
+
 	if (this->zoom >= 45.0f) {
 		this->zoom = 45.0f;
 	}

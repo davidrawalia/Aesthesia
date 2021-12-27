@@ -18,8 +18,7 @@ in float outSpecular;
 
 out vec4 color;
 
-void main()
-{
+void main() {
 	vec4 meshColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	if (textureBoolOut > 0) {
 		meshColour = texture(textureMap, outTexCoord);

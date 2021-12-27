@@ -14,8 +14,7 @@ in vec4 FragPosLightSpace;
 
 out vec4 color;
 
-void main()
-{
+void main() {
 	vec4 meshColour = texture(textureMap, outTexCoord);
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 	vec3 specularColor = vec3(1.0f, 1.0f, 1.0f);
@@ -33,30 +32,31 @@ void main()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 	vec3 specular_contribution = specularStrength * spec * specularColor;
 
-	vec4 result_color = vec4(amb_contribution + (diffuse_contribution + specular_contribution), 1.0);
+	vec4 result_color = vec4(amb_contribution + 
+							 (diffuse_contribution + specular_contribution), 1.0);
 	result_color = result_color * 0.85;
 	result_color = clamp(result_color, 0.0, 1.0);
-	result_color = vec4((floor(result_color.x*10.0))/10.0, (floor(result_color.y*10.0))/10.0, (floor(result_color.z*10.0))/10.0, 1.0);
+	result_color = vec4((floor(result_color.x*10.0))/10.0, 
+						(floor(result_color.y*10.0))/10.0, 
+						(floor(result_color.z*10.0))/10.0, 1.0);
 
 
 	if (result_color.x == 1.0) {
-		color = vec4(meshColour.r * 0.5, meshColour.g * 0.5, meshColour.b * 0.5, 1.0) + vec4(0.5, 0.5, 0.5, 1.0);
+		color = vec4(meshColour.r * 0.5, meshColour.g * 0.5, meshColour.b * 0.5, 1.0) + 
+					 vec4(0.5, 0.5, 0.5, 1.0);
 	}
 	else if (result_color.x > 0.9) {
-		color = vec4(meshColour.r * 0.75, meshColour.g * 0.75, meshColour.b * 0.75, 1.0) + vec4(0.25, 0.25, 0.25, 1.0);
+		color = vec4(meshColour.r * 0.75, meshColour.g * 0.75, 
+					 meshColour.b * 0.75, 1.0) + vec4(0.25, 0.25, 0.25, 1.0);
 	}
 	else if (result_color.x > 0.4) {
 		color = meshColour;
 	}
 	else if (result_color.x > 0.2) {
-		color = vec4(meshColour.r * 0.75, meshColour.g * 0.75, meshColour.b * 0.75, 1.0);
+		color = vec4(meshColour.r * 0.75, meshColour.g * 0.75, meshColour.b * 0.75, 
+					 1.0);
 	}
 	else {
 		color = vec4(meshColour.r * 0.5, meshColour.g * 0.5, meshColour.b * 0.5, 1.0);
 	}
-
-
-//	color = (meshColour + result_color)/2.0;
-
-
 }

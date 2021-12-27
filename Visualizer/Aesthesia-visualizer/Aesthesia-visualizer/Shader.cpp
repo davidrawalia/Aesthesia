@@ -18,7 +18,8 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 		VertexShaderStream.close();
 	}
 	else {
-		printf("Impossible to open %s. Are you in the right directory ?\n", vertex_shader_path.c_str());
+		printf("Impossible to open %s. Are you in the right directory ?\n", 
+			   vertex_shader_path.c_str());
 		getchar();
 		exit(-1);
 	}
@@ -34,7 +35,8 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 		FragmentShaderStream.close();
 	}
 	else {
-		printf("Impossible to open %s. Are you in the right directory ?\n", fragment_shader_path.c_str());
+		printf("Impossible to open %s. Are you in the right directory ?\n", 
+			   fragment_shader_path.c_str());
 		getchar();
 		exit(-1);
 	}
@@ -53,7 +55,8 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	if (InfoLogLength > 0) {
 		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
+		glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, 
+					       &VertexShaderErrorMessage[0]);
 		printf("%s\n", &VertexShaderErrorMessage[0]);
 	}
 
@@ -68,7 +71,8 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	if (InfoLogLength > 0) {
 		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, &FragmentShaderErrorMessage[0]);
+		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, 
+						   &FragmentShaderErrorMessage[0]);
 		printf("%s\n", &FragmentShaderErrorMessage[0]);
 	}
 
@@ -145,17 +149,14 @@ GLuint Shader::getTextureBoolLoc() {
 	return textureBoolLoc;
 }
 
-GLuint Shader::getReflectionCoefficientLoc()
-{
+GLuint Shader::getReflectionCoefficientLoc() {
 	return reflectionCoefficientLoc;
 }
 
-GLuint Shader::getReflectionExponentLoc()
-{
+GLuint Shader::getReflectionExponentLoc() {
 	return reflectionExponentLoc;
 }
 
-GLuint Shader::getSpecularLoc()
-{
+GLuint Shader::getSpecularLoc() {
 	return specularLoc;
 }

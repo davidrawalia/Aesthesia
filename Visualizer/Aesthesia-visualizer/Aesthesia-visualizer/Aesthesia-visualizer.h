@@ -2,8 +2,6 @@
 
 #include "Shader.h"
 #include "Camera.h"
-#include "Object.h"
-#include "Cube.h"
 #include "Mesh.h"
 #include "Material.h"
 
