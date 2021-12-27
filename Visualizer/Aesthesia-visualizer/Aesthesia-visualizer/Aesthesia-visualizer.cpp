@@ -42,96 +42,99 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 
 		// FPS counter
 		// TODO: abstract this to it's own object
-		GLdouble currentTime = glfwGetTime();
+		currentTime = glfwGetTime();
 		deltaTime = currentTime - lastFrame;
-		lastFrame = currentTime;
 
-		nbFrames++;
-		if (currentTime - lastTime >= 1.0) 
-		{
-			if (fps_count) std::cout << nbFrames << " - ";
-			nbFrames = 0;
-			lastTime += 1.0;
+		if (deltaTime > (1.0 / 60.0)) {
+			lastFrame = currentTime;
+
+				nbFrames++;
+				if (currentTime - lastTime >= 1.0)
+				{
+					if (fps_count) std::cout << nbFrames << " - ";
+						nbFrames = 0;
+						lastTime += 1.0;
+				}
+
+			// Event polling
+			glfwPollEvents();
+			doMovement();
+
+			// Update transformation matrices 
+			projection = glm::perspective(camera.GetZoom(),
+										  (GLfloat)width / (GLfloat)height,
+									      0.1f, 1000.0f);
+			view = camera.GetViewMatrix();
+			cameraPosition = camera.getPosition();
+			worldTransform = glm::mat4(1.0f);
+			worldTransform = glm::rotate(worldTransform, -worldXRotation, right);
+			worldTransform = glm::rotate(worldTransform, worldYRotation, up);
+			lightWorldPos = worldTransform * glm::vec4(lightModelPos, 1.0f);
+
+			// Clear buffers 
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			// Apply world transformation
+
+			glUniformMatrix4fv(shader->getViewLoc(), 1, GL_FALSE, glm::value_ptr(view));
+			glUniformMatrix4fv(shader->getProjLoc(), 1, GL_FALSE, glm::value_ptr(projection));
+			glUniform3fv(shader->getCameraPositionLoc(), 1, glm::value_ptr(cameraPosition));
+
+			glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(worldTransform));
+			glUniform3fv(shader->getLightLoc(), 1, glm::value_ptr(lightWorldPos));
+			glUniform1f(shader->getAmbLightLoc(), ambLight);
+
+			// Bind vertex array and render scene
+			for (int i = 0; i < mesh->getScene()->mNumMeshes; i++) {
+
+				if (material->hasTexture(i)) {
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, material->getTexture(i));
+					glUniform1f(shader->getTextureBoolLoc(), 1);
+				}
+				else {
+					glUniform1f(shader->getTextureBoolLoc(), 0);
+				}
+
+				glUniform1i(glGetUniformLocation(shader->getProgramID(), "meshTexture"), 0);
+				glBindVertexArray(mesh->getVAO()[i]);
+				glUniform3fv(shader->getColorLoc(), 1, glm::value_ptr(mesh->getModelColor()[i]));
+				glUniform1f(shader->getReflectionCoefficientLoc(), mesh->getReflectionCoefficient(i));
+				glUniform1f(shader->getReflectionExponentLoc(), mesh->getReflectionExponent(i));
+				glUniform1f(shader->getSpecularLoc(), mesh->getSpecular(i));
+
+				// Apply transformations to the mesh
+				meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
+				// Apply dynamic transforms
+				if (i == 0) {
+					meshTransform = glm::scale(meshTransform, glm::vec3(
+						1 + inData[i] * 0.01,
+						1 + inData[i] * 0.01,
+						1 + inData[i] * 0.01));
+					meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, 1.0f, 0.0f));
+				}
+				else if (i == 1) {
+					meshTransform = glm::translate(meshTransform, glm::vec3(
+						0,
+						inData[i] * 0.01,
+						0
+					));
+					meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, 1.0f, 0.0f));
+				}
+				else if (i == 2) {
+					meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, -1.0f, 0.0f));
+				}
+				else if (i == 3) {
+					meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, -1.0f, 0.0f));
+				};
+				meshTransform = worldTransform * meshTransform;
+				glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
+
+				glDrawElements(GL_TRIANGLES, mesh->getScene()->mMeshes[i]->mNumFaces * 3, GL_UNSIGNED_INT, nullptr);
+				glBindVertexArray(0);
+			}
+			glfwSwapBuffers(window);
 		}
-
-		// Event polling
-		glfwPollEvents();
-		doMovement();
-
-		// Update transformation matrices 
-		projection = glm::perspective(camera.GetZoom(), 
-												(GLfloat)width/(GLfloat)height, 
-											    0.1f, 1000.0f);
-		view = camera.GetViewMatrix();
-		cameraPosition = camera.getPosition();
-		worldTransform = glm::mat4(1.0f);
-		worldTransform = glm::rotate(worldTransform, -worldXRotation, right);
-		worldTransform = glm::rotate(worldTransform, worldYRotation, up);
-		lightWorldPos = worldTransform * glm::vec4(lightModelPos, 1.0f);
-
-		// Clear buffers 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// Apply world transformation
-
-		glUniformMatrix4fv(shader->getViewLoc(), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(shader->getProjLoc(), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(shader->getCameraPositionLoc(), 1, glm::value_ptr(cameraPosition));
-
-		glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(worldTransform));
-		glUniform3fv(shader->getLightLoc(), 1, glm::value_ptr(lightWorldPos));
-		glUniform1f(shader->getAmbLightLoc(), ambLight);
-
-		// Bind vertex array and render scene
-		for (int i = 0; i < mesh->getScene()->mNumMeshes; i++) {
-
-			if (material->hasTexture(i)) {
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, material->getTexture(i));
-				glUniform1f(shader->getTextureBoolLoc(), 1);
-			}
-			else {
-				glUniform1f(shader->getTextureBoolLoc(), 0);
-			}
-
-			glUniform1i(glGetUniformLocation(shader->getProgramID(), "meshTexture"), 0);
-			glBindVertexArray(mesh->getVAO()[i]);
-			glUniform3fv(shader->getColorLoc(), 1, glm::value_ptr(mesh->getModelColor()[i]));
-			glUniform1f(shader->getReflectionCoefficientLoc(), mesh->getReflectionCoefficient(i));
-			glUniform1f(shader->getReflectionExponentLoc(), mesh->getReflectionExponent(i));
-			glUniform1f(shader->getSpecularLoc(), mesh->getSpecular(i));
-
-			// Apply transformations to the mesh
-			meshTransform = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-			// Apply dynamic transforms
-			if (i == 0) {
-				meshTransform = glm::scale(meshTransform, glm::vec3(
-					1 + inData[i] * 0.01,
-					1 + inData[i] * 0.01,
-					1 + inData[i] * 0.01));
-				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, 1.0f, 0.0f));
-			}
-			else if (i == 1) {
-				meshTransform = glm::translate(meshTransform, glm::vec3(
-					0,
-					inData[i] * 0.01,
-					0
-				));
-				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, 1.0f, 0.0f));
-			}
-			else if (i == 2) {
-				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, -1.0f, 0.0f));
-			}
-			else if (i == 3) {
-				meshTransform = glm::rotate(meshTransform, (float)fmod(glfwGetTime() / 10, 360), glm::vec3(0.0f, -1.0f, 0.0f));
-			};
-			meshTransform = worldTransform * meshTransform;
-			glUniformMatrix4fv(shader->getModelLoc(), 1, GL_FALSE, glm::value_ptr(meshTransform));
-
-			glDrawElements(GL_TRIANGLES, mesh->getScene()->mMeshes[i]->mNumFaces * 3, GL_UNSIGNED_INT, nullptr);
-			glBindVertexArray(0);
-		}
-		glfwSwapBuffers(window);
 	}
 
 	// Properly de-allocate all resources once they've outlived their purpose
