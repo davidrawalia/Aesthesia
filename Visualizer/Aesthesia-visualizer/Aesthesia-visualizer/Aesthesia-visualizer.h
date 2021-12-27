@@ -12,6 +12,7 @@ const bool fps_count = false;
 
 const GLuint WIN_WIDTH = 1920, WIN_HEIGHT = 1080;
 GLFWwindow* window;
+GLdouble currentTime;
 GLclampf* redbk = new GLclampf(0.0f);
 GLclampf* greenbk = new GLclampf(1.0f);
 GLclampf* bluebk = new GLclampf(0.0f);
