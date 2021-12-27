@@ -2,8 +2,6 @@
 
 #include "Shader.h"
 #include "Camera.h"
-#include "Object.h"
-#include "Cube.h"
 #include "Mesh.h"
 #include "Material.h"
 
@@ -18,6 +16,13 @@ GLclampf* greenbk = new GLclampf(1.0f);
 GLclampf* bluebk = new GLclampf(0.0f);
 GLfloat worldYRotation = 0.0f;
 GLfloat worldXRotation = 0.0f;
+GLfloat xOffset;
+GLfloat yOffset;
+const GLfloat scaleSpeed = 0.1;
+const GLfloat positionSpeed = 1;
+const GLfloat rotationSpeed = 0.0872665;
+const GLfloat velocity = 0.2;
+GLdouble xpos, ypos;
 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 right = glm::vec3(-1.0f, 0.0f, 0.0f);
 glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
