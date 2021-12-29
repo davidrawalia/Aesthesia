@@ -16,6 +16,7 @@ Libraries used:
 * SOIL 2.0 (https://bitbucket.org/SpartanJ/soil2/src/default/)
 * Boost 1.71.0 (https://www.boost.org/users/download/#live)
 * RapidJSON 1.1.0 (https://github.com/Tencent/rapidjson/releases)
+* SPDLOG 1.9.2 (https://github.com/gabime/spdlog)
 
 Make sure to link the libraries in your IDE before trying to compile.
 
