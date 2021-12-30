@@ -101,7 +101,7 @@ void Mesh::importMesh(std::string filePath) {
 	scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_MaxQuality);
 	// If the import failed, report it
 	if (!scene) {
-		std::cout << "file not found";
+		spdlog::get("file_log")->error("Mesh file not found");
 	}
 
 	// Extract vertex coordinates

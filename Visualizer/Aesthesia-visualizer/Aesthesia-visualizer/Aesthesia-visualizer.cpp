@@ -37,11 +37,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	}
 	if (vm.count("vshader")) {
 		vertexShaderPath = vm["vshader"].as<std::string>();
-		spdlog::get("file_log")->info("Using vertex shader: {}", vertexShaderPath);
 	}
 	if (vm.count("fshader")) {
 		fragmentShaderPath = vm["fshader"].as<std::string>();
-		spdlog::get("file_log")->info("Using fragment shader: {}", fragmentShaderPath);
 	}
 	if (vm.count("model")) {
 		modelPath = vm["model"].as<std::string>();
@@ -91,7 +89,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 			}
 		}
 		catch (interprocess_exception e) {
-			std::cout << e.what() << '\n';
+			spdlog::get("file_log")->error(e.what());
 		}
 
 		// FPS counter and limiter
@@ -105,7 +103,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 				nbFrames++;
 				if (currentTime - lastTime >= 1.0) {
-					if (fps_count) std::cout << nbFrames << " - ";
 						nbFrames = 0;
 						lastTime += 1.0;
 				}
@@ -227,7 +224,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 }
 
 int init() {
-	std::cout << "Starting GLFW context, OpenGL 3.3" << std::endl;
+	spdlog::get("file_log")->info("Starting GLFW context, OpenGL 3.3");
 	// Init GLFW
 	glfwInit();
 	// Set all the required options for GLFW
@@ -240,14 +237,14 @@ int init() {
 	window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Aesthesia", nullptr, 
 							  nullptr);
 	if (window == nullptr) {
-		std::cout << "Failed to create GLFW window" << std::endl;
+		spdlog::get("file_log")->error("Failed to create GLFW window");
 		glfwTerminate();
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK) {
-		std::cout << "Failed to initialize GLEW" << std::endl;
+		spdlog::get("file_log")->error("Failed to initialize GLEW");
 		return -1;
 	}
 
