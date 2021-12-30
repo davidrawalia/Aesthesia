@@ -6,6 +6,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+	logger = spdlog::basic_logger_mt("file_log", "logs/visualizer-log.txt");
+	spdlog::get("file_log")->info("Visualizer process start");
+
 	if (init() < 0) {
 		return -1;
 	}
