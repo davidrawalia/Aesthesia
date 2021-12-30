@@ -19,10 +19,12 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/fmt/ostr.h>
 #include <exception>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/program_options.hpp>
 #include <cstdlib>
 #include <cstddef>
 #include <cassert>
@@ -35,3 +37,5 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <stdlib.h>
+#include <locale>
+#include <codecvt>

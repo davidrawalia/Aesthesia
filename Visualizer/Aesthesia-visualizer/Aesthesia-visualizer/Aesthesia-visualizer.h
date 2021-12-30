@@ -9,6 +9,11 @@ const bool debug = false;
 const bool fps_count = false;
 
 std::shared_ptr<spdlog::logger> logger;
+
+std::string vertexShaderPath;
+std::string fragmentShaderPath;
+std::string modelPath;
+
 const GLuint WIN_WIDTH = 1920, WIN_HEIGHT = 1080;
 GLFWwindow* window;
 GLdouble currentTime;

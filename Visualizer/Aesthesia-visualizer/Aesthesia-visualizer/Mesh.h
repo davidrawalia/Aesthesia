@@ -3,6 +3,7 @@
 class Mesh {
 public:
 	Mesh();
+	Mesh(std::string filepath);
 	Mesh(const Mesh&) {};
 	const aiScene* getScene();
 	std::vector<GLuint> getVAO();
@@ -16,6 +17,7 @@ public:
 	float getReflectionExponent(int i);
 	float getSpecular(int i);
 private:
+	void importMesh(std::string filePath);
 	const aiScene* scene;
 	std::wstring wFilePath;
 	std::string filePath;

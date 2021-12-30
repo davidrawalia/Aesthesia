@@ -4,20 +4,83 @@
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 					_In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	namespace po = boost::program_options;
+
+	//Initialize logger
 
 	logger = spdlog::basic_logger_mt("file_log", "logs/visualizer-log.txt");
 	spdlog::get("file_log")->info("Visualizer process start");
+
+	//Log command-line arguments
+	std::wstring wstrArgs = lpCmdLine;
+
+	//Setup unicode converter
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+
+	//Convert arguments from unicode to string for loggin
+	std::string args = converter.to_bytes(wstrArgs);
+	spdlog::get("file_log")->info(args);
+
+	//Define command-line arguments
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help", "produce help message")
+		("vshader", po::value<std::string>(), "set path to vertex shader")
+		("fshader", po::value<std::string>(), "set path to fragment shader")
+		("model", po::value<std::string>(), "set path to 3d model");
+
+	//Parse command-line arguments
+	po::variables_map vm;
+	std::vector<std::wstring> argsList = po::split_winmain(lpCmdLine);
+	store(po::wcommand_line_parser(argsList).options(desc).run(), vm);
+	po::notify(vm);
+
+
+	if (vm.count("help")) {
+		std::cout << (desc);
+		return 1;
+	}
+
+	if (vm.count("vshader")) {
+		vertexShaderPath = vm["vshader"].as<std::string>();
+		spdlog::get("file_log")->info("Using vertex shader: {}", vertexShaderPath);
+	}
+
+	if (vm.count("fshader")) {
+		fragmentShaderPath = vm["fshader"].as<std::string>();
+		spdlog::get("file_log")->info("Using fragment shader: {}", fragmentShaderPath);
+	}
+
+	if (vm.count("model")) {
+		modelPath = vm["model"].as<std::string>();
+		spdlog::get("file_log")->info("Using model: {}", modelPath);
+	}
 
 	if (init() < 0) {
 		return -1;
 	}
 
+	if (vertexShaderPath.empty()) {
+		vertexShaderPath = "vertex.shader";
+		spdlog::get("file_log")->info("Using default vertex shader");
+	}
+	if (fragmentShaderPath.empty()) {
+		fragmentShaderPath = "fragmen.shader";
+		spdlog::get("file_log")->info("Using default fragment shader");
+	}
+
 	// Shader setup
-	shader = new Shader("vertex.shader", "fragment.shader");
+	shader = new Shader(vertexShaderPath, fragmentShaderPath);
 
 	// Load mesh
-	mesh = new Mesh();
+	if (modelPath.empty()) {
+		mesh = new Mesh();
+	}
+	else {
+		mesh = new Mesh(modelPath);
+	}
 	
 	// Extract texture file paths
 	material = new Material(mesh);
