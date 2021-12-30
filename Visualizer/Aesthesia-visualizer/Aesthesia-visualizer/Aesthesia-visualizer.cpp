@@ -4,10 +4,50 @@
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 					_In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	namespace po = boost::program_options;
 
 	logger = spdlog::basic_logger_mt("file_log", "logs/visualizer-log.txt");
 	spdlog::get("file_log")->info("Visualizer process start");
+
+	std::wstring wstrArgs = lpCmdLine;
+
+	//setup converter
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+
+	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
+	std::string args = converter.to_bytes(wstrArgs);
+	spdlog::get("file_log")->info(args);
+
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help", "produce help message")
+		("vshader", po::value<std::string>(), "set path to vertex shader")
+		("fshader", po::value<std::string>(), "set path to fragment shader")
+		("model", po::value<std::string>(), "set path to 3d model");
+
+	po::variables_map vm;
+	std::vector<std::wstring> argsList = po::split_winmain(lpCmdLine);
+	store(po::wcommand_line_parser(argsList).options(desc).run(), vm);
+	po::notify(vm);
+
+	if (vm.count("help")) {
+		std::cout << (desc);
+		return 1;
+	}
+
+	if (vm.count("vshader")) {
+		spdlog::get("file_log")->info("Using vertex shader: {}", vm["vshader"].as<std::string>());
+	}
+
+	if (vm.count("fshader")) {
+		spdlog::get("file_log")->info("Using fragment shader: {}", vm["fshader"].as<std::string>());
+	}
+
+	if (vm.count("model")) {
+		spdlog::get("file_log")->info("Using model: {}", vm["model"].as<std::string>());
+	}
 
 	if (init() < 0) {
 		return -1;
