@@ -8,6 +8,7 @@
 const bool debug = false;
 const bool fps_count = false;
 
+std::shared_ptr<spdlog::logger> logger;
 const GLuint WIN_WIDTH = 1920, WIN_HEIGHT = 1080;
 GLFWwindow* window;
 GLdouble currentTime;

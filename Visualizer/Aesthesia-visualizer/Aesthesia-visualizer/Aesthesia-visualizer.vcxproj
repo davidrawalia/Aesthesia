@@ -96,13 +96,13 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\libs\assimp-5.0.1\include;D:\libs\soil2\src;D:\libs\glm;D:\libs\glfw-3.2.1.bin.WIN32\include;D:\libs\glew-2.1.0\include;D:\libs\boost_1_71_0;$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\libs\assimp-5.0.1\include;D:\libs\soil2\src;D:\libs\glm;D:\libs\glfw-3.2.1.bin.WIN32\include;D:\libs\glew-2.1.0\include;D:\libs\boost_1_71_0;$(WindowsSDK_IncludePath);D:\libs\spdlog-1.x\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\libs\assimp-5.0.1\lib\Debug;D:\libs\boost_1_71_0\stage\lib;D:\libs\glew-2.1.0\lib\Release\Win32;D:\libs\glfw-3.3.bin.WIN32\lib-vc2017;D:\libs\soil2\lib\windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc141-mtd.lib;opengl32.lib;glew32.lib;glfw3.lib;soil2-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\libs\spdlog-1.x\build\Debug;D:\libs\assimp-5.0.1\lib\Debug;D:\libs\boost_1_71_0\stage\lib;D:\libs\glew-2.1.0\lib\Release\Win32;D:\libs\glfw-3.3.bin.WIN32\lib-vc2017;D:\libs\soil2\lib\windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc141-mtd.lib;opengl32.lib;glew32.lib;glfw3.lib;soil2-debug.lib;spdlogd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

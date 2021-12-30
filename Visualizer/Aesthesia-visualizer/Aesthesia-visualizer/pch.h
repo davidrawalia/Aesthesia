@@ -16,6 +16,9 @@
 #include <assimp/postprocess.h> // Post processing flags
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/Logger.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <exception>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
