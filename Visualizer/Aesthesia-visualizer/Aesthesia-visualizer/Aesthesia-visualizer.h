@@ -8,7 +8,6 @@
 namespace po = boost::program_options;
 
 const bool debug = false;
-const bool fps_count = false;
 
 std::shared_ptr<spdlog::logger> logger;
 

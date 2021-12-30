@@ -18,8 +18,8 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 		VertexShaderStream.close();
 	}
 	else {
-		printf("Impossible to open %s. Are you in the right directory ?\n", 
-			   vertex_shader_path.c_str());
+		spdlog::get("file_log")->error("Impossible to open {}. Are you in the right directory ?", 
+									   vertex_shader_path.c_str());
 		getchar();
 		exit(-1);
 	}
@@ -35,8 +35,8 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 		FragmentShaderStream.close();
 	}
 	else {
-		printf("Impossible to open %s. Are you in the right directory ?\n", 
-			   fragment_shader_path.c_str());
+		spdlog::get("file_log")->error("Impossible to open {}. Are you in the right directory ?",
+									   fragment_shader_path.c_str());
 		getchar();
 		exit(-1);
 	}
@@ -45,7 +45,7 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 	int InfoLogLength;
 
 	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", vertex_shader_path.c_str());
+	spdlog::get("file_log")->info("Compiling shader: {}", vertex_shader_path.c_str());
 	char const * VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, nullptr);
 	glCompileShader(VertexShaderID);
@@ -57,11 +57,11 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
 		glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, 
 					       &VertexShaderErrorMessage[0]);
-		printf("%s\n", &VertexShaderErrorMessage[0]);
+		spdlog::get("file_log")->error(&VertexShaderErrorMessage[0]);
 	}
 
 	// Compile Fragment Shader
-	printf("Compiling shader : %s\n", fragment_shader_path.c_str());
+	spdlog::get("file_log")->info("Compiling shader: {}", fragment_shader_path.c_str());
 	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
 	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, nullptr);
 	glCompileShader(FragmentShaderID);
@@ -73,11 +73,11 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
 		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, 
 						   &FragmentShaderErrorMessage[0]);
-		printf("%s\n", &FragmentShaderErrorMessage[0]);
+		spdlog::get("file_log")->error(&FragmentShaderErrorMessage[0]);
 	}
 
 	// Link the program
-	printf("Linking program\n");
+	spdlog::get("file_log")->info("Linking program");
 	ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
@@ -92,7 +92,7 @@ Shader::Shader(std::string vertex_shader_path, std::string fragment_shader_path)
 	if (InfoLogLength > 0) {
 		std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
 		glGetProgramInfoLog(ProgramID, InfoLogLength, nullptr, &ProgramErrorMessage[0]);
-		printf("%s\n", &ProgramErrorMessage[0]);
+		spdlog::get("file_log")->error(&ProgramErrorMessage[0]);
 	}
 
 	//free up memory
