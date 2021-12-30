@@ -5,10 +5,15 @@
 #include "Mesh.h"
 #include "Material.h"
 
+namespace po = boost::program_options;
+
 const bool debug = false;
 const bool fps_count = false;
 
 std::shared_ptr<spdlog::logger> logger;
+
+po::variables_map vm;
+std::vector<std::wstring> argsList;
 
 std::string vertexShaderPath;
 std::string fragmentShaderPath;
